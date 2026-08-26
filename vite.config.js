@@ -7,6 +7,9 @@ export default defineConfig({
     port: 3000,
     open: false,
     host: true,
-    allowedHosts: true
+    allowedHosts: true,
+    watch: {
+      ignored: ['**/ascii_eyes/**', '**/scratch/**']
+    }
   }
 });

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "motion/react";
 import { Check, ArrowRight, Eye, EyeOff, AlertCircle, RefreshCw, XCircle, Volume2, VolumeX, AlertTriangle, Sparkles, Tv, Zap, Terminal } from "lucide-react";
 import TerminalCyberBotCompanion from "../components/mascots/TerminalCyberBotCompanion";
 import MatrixHelloBossTransition from "../components/MatrixHelloBossTransition";
+import AsciiEyesVideoPlayer from "../components/AsciiEyesVideoPlayer";
+import CompilerWorkspace from "../components/compiler/CompilerWorkspace";
 
 // Web Audio Synthesizer with rich audio effects
 class TerminalAudioEngine {
@@ -288,6 +290,8 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
   const [compileStep, setCompileStep] = useState(0);
   const [authSuccess, setAuthSuccess] = useState(false);
   const [showHelloBossTransition, setShowHelloBossTransition] = useState(false);
+  const [showAsciiEyesVideo, setShowAsciiEyesVideo] = useState(false);
+  const [inWorkspace, setInWorkspace] = useState(false);
   const [errorDetails, setErrorDetails] = useState(null);
   const [shakeKey, setShakeKey] = useState(0);
 
@@ -526,7 +530,7 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
 
     setIsCompiling(false);
     setAuthSuccess(true);
-    setShowHelloBossTransition(true);
+    setShowAsciiEyesVideo(true);
     terminalAudio.playSuccessChime();
   };
 
@@ -599,7 +603,7 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
     setIsCompiling(false);
     setIsNewUserRegistration(true);
     setAuthSuccess(true);
-    setShowHelloBossTransition(true);
+    setShowAsciiEyesVideo(true);
     terminalAudio.playSuccessChime();
   };
 
@@ -646,6 +650,22 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
   };
 
   const entropy = getPasswordStrength();
+
+  if (inWorkspace) {
+    return (
+      <CompilerWorkspace
+        userEmail={email || "developer@swaply.io"}
+        onSignOut={() => {
+          setInWorkspace(false);
+          setAuthSuccess(false);
+          setPassword("");
+          setConfirmPassword("");
+          setCompileStep(0);
+          setErrorDetails(null);
+        }}
+      />
+    );
+  }
 
   return (
     <main
@@ -694,13 +714,30 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
         />
       )}
 
+      {/* Cinematic ASCII Eyes Video Player Overlay */}
+      <AnimatePresence>
+        {showAsciiEyesVideo && (
+          <AsciiEyesVideoPlayer
+            userEmail={email || "developer@swaply.io"}
+            fps={6}
+            onComplete={() => {
+              setShowAsciiEyesVideo(false);
+              setInWorkspace(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Fullscreen Matrix "HELLO BOSS" Cyber Transition Overlay */}
       <AnimatePresence>
         {showHelloBossTransition && (
           <MatrixHelloBossTransition
             userEmail={email || "developer@swaply.io"}
             isNewUser={isNewUserRegistration}
-            onComplete={() => setShowHelloBossTransition(false)}
+            onComplete={() => {
+              setShowHelloBossTransition(false);
+              setInWorkspace(true);
+            }}
           />
         )}
       </AnimatePresence>
@@ -893,6 +930,29 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
               <span>{soundEnabled ? "SFX" : "MUTE"}</span>
             </button>
 
+            <button
+              type="button"
+              title="Play ASCII Eyes Awakening Video"
+              onClick={() => setShowAsciiEyesVideo(true)}
+              style={{
+                background: "rgba(34, 197, 94, 0.2)",
+                border: "1px solid rgba(34, 197, 94, 0.4)",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                color: "#86efac",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "10px",
+                cursor: "pointer",
+                fontWeight: 700,
+                boxShadow: "0 0 10px rgba(34, 197, 94, 0.2)",
+              }}
+            >
+              <Eye size={11} color="#22c55e" />
+              <span>ASCII EYES</span>
+            </button>
+
             {onReplayIntro && (
               <button
                 type="button"
@@ -979,17 +1039,17 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
                 <div>• VAULT_STATUS: <strong style={{ color: "#4ade80" }}>ENCRYPTED (ARGON2id)</strong></div>
               </div>
 
-              <div style={{ marginTop: "2px" }}>
+              <div style={{ marginTop: "4px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <button
                   type="button"
-                  onClick={handleReset}
+                  onClick={() => setInWorkspace(true)}
                   style={{
                     backgroundColor: "#22c55e",
                     color: "#051105",
                     border: 0,
                     borderRadius: "4px",
                     padding: "8px 16px",
-                    fontWeight: 700,
+                    fontWeight: 800,
                     fontFamily: "inherit",
                     fontSize: "11.5px",
                     cursor: "pointer",
@@ -997,6 +1057,50 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
                     alignItems: "center",
                     gap: "6px",
                     boxShadow: "0 0 15px rgba(34, 197, 94, 0.4)",
+                  }}
+                >
+                  <Sparkles size={13} />
+                  <span>[ 🚀 ENTER COMPILER WORKSPACE ]</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAsciiEyesVideo(true)}
+                  style={{
+                    backgroundColor: "rgba(34, 197, 94, 0.15)",
+                    color: "#4ade80",
+                    border: "1px solid rgba(34, 197, 94, 0.4)",
+                    borderRadius: "4px",
+                    padding: "8px 14px",
+                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    fontSize: "11.5px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                >
+                  <Eye size={12} />
+                  <span>[ 👁️ REPLAY ASCII EYES ]</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "#86efac",
+                    border: "1px solid rgba(34, 197, 94, 0.4)",
+                    borderRadius: "4px",
+                    padding: "8px 14px",
+                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    fontSize: "11.5px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
                   }}
                 >
                   <RefreshCw size={12} />

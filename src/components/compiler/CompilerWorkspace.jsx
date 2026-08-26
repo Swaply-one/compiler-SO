@@ -15,16 +15,32 @@ import {
   Code2,
 } from "lucide-react";
 
-export default function CompilerWorkspace({ userEmail, onSignOut }) {
+export default function CompilerWorkspace({ userEmail = "developer@swaply.io", onSignOut }) {
   const [activeFile, setActiveFile] = useState("main.sw");
   const [targetArch, setTargetArch] = useState("x86_64-native");
   const [isRunning, setIsRunning] = useState(false);
+  const [botMessage, setBotMessage] = useState("🤖 Welcome to your Compiler Workspace, Boss! Press [RUN F5] to execute code.");
   const [terminalOutput, setTerminalOutput] = useState([
-    "[swaply-one v1.0.0] Initialized compiler runtime environment.",
-    `[auth] Authenticated developer: ${userEmail || "developer@swaply.io"}`,
-    "[llvm] Backend loaded: LLVM 18.1.8 Target: x86_64-unknown-linux-gnu",
-    "Ready. Press 'Run' (F5) to compile and execute program.",
+    "╔═══════════════════════════════════════════════════════════════════════════════╗",
+    "║                    ⚡ SWAPLY ONE COMPILER LAB // v1.0.0 ⚡                    ║",
+    `║  AUTHENTICATED: ${(userEmail || "developer@swaply.io").padEnd(30, " ")} | ACCESS: 0xROOT_ADMIN        ║`,
+    "║  LLVM BACKEND : 18.1.8-RELEASE-x86_64        | SIMD OPT: AVX-512 ACTIVE       ║",
+    "╚═══════════════════════════════════════════════════════════════════════════════╝",
+    "[runtime] LLVM JIT Compiler daemon ready.",
+    "[runtime] Workspace mounted: swaply-core/main.sw",
+    "Ready. Press 'RUN [F5]' to build and execute SIMD vector optimizations.",
   ]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "F5" || (e.ctrlKey && e.key === "Enter")) {
+        e.preventDefault();
+        handleRun();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [targetArch]);
 
   const sourceCode = `// SwaplyOne Compiler — Target: Native x86_64
 import std::io;
@@ -53,7 +69,9 @@ pub fn main() -> Result<(), std::Error> {
 }`;
 
   const handleRun = () => {
+    if (isRunning) return;
     setIsRunning(true);
+    setBotMessage("⚡ Compiling LLVM AST & emitting machine code...");
     setTerminalOutput((prev) => [
       ...prev,
       `> swaplyc compile --target=${targetArch} --opt-level=3 main.sw`,
@@ -64,9 +82,12 @@ pub fn main() -> Result<(), std::Error> {
       "[stdout] [swaply-one] Executing SIMD vector optimizations...",
       "[stdout] [swaply-one] Pipeline compute finished in 2.7ms",
       "[stdout] [swaply-one] Target emitted 0 errors, 0 warnings.",
-      "✓ Process finished with exit code 0.",
+      "✓ Process finished successfully with exit code 0.",
     ]);
-    setTimeout(() => setIsRunning(false), 600);
+    setTimeout(() => {
+      setIsRunning(false);
+      setBotMessage("🎉 Compilation successful! 0 errors, 0 warnings.");
+    }, 600);
   };
 
   return (
@@ -451,6 +472,35 @@ pub fn main() -> Result<(), std::Error> {
           </div>
         </div>
       </div>
+
+      {/* Bottom IDE Status Bar with CyberBot Assistant */}
+      <footer
+        style={{
+          height: "28px",
+          backgroundColor: "#111411",
+          borderTop: "1px solid #222722",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 14px",
+          fontSize: "11px",
+          fontFamily: "'JetBrains Mono', monospace",
+          color: "#8D958B",
+          userSelect: "none",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ color: "#22c55e", fontWeight: 700 }}>● SWAPLY_ONE_ONLINE</span>
+          <span style={{ color: "#4ade80" }}>{botMessage}</span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <span>UTF-8</span>
+          <span>LF</span>
+          <span>LLVM v18.1</span>
+          <span style={{ color: "#228B22", fontWeight: 700 }}>[F5] RUN</span>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -15,8 +15,8 @@ import Page1_MochiCat from "./pages/Page1_MochiCat";
 import Page3_CompilerLab from "./pages/Page3_CompilerLab";
 
 export default function App() {
-  const [showIntro, setShowIntro] = useState(true);
-  const [activePage, setActivePage] = useState("retro_terminal"); // Main Flagship Theme
+  const [showIntro, setShowIntro] = useState(false);
+  const [activePage, setActivePage] = useState("retro_terminal"); // Flagship Retro CRT Terminal
 
   const renderActivePage = () => {
     switch (activePage) {
