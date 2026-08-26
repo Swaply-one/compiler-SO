@@ -1,0 +1,752 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(34, 139, 34, 0.08), transparent 32%),
+    radial-gradient(circle at 85% 80%, rgba(34, 139, 34, 0.06), transparent 30%),
+    #f7f7f2;
+  color: #181a18;
+  font-family: "DM Sans", sans-serif;
+}
+
+.ambient {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.ambient-one {
+  width: 420px;
+  height: 420px;
+  left: -180px;
+  top: -160px;
+  border: 1px solid rgba(34, 139, 34, 0.08);
+}
+
+.ambient-two {
+  width: 500px;
+  height: 500px;
+  right: -250px;
+  bottom: -250px;
+  border: 1px solid rgba(34, 139, 34, 0.08);
+}
+
+.login-container {
+  width: min(1080px, 100%);
+  min-height: 680px;
+  display: grid;
+  grid-template-columns: 48% 52%;
+  background: #ffffff;
+  border: 1px solid #e4e6df;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 80px rgba(23, 35, 23, 0.09),
+    0 8px 24px rgba(23, 35, 23, 0.04);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Character panel                                                            */
+/* -------------------------------------------------------------------------- */
+
+.character-panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 38px;
+  background: linear-gradient(150deg, #f3f6ec 0%, #ebf1e2 50%, #e3ecd8 100%);
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #228b22;
+  color: white;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  box-shadow: 0 5px 14px rgba(34, 139, 34, 0.25);
+}
+
+.character-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.character-heading {
+  align-self: flex-start;
+  text-align: left;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 2;
+}
+
+.character-heading span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #6e756a;
+  font-weight: 500;
+}
+
+.character-heading h1 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(34px, 4vw, 48px);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+  font-weight: 500;
+}
+
+.character-heading strong {
+  color: #228b22;
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------------------------- */
+/* High-Quality Mascot Anatomy                                                */
+/* -------------------------------------------------------------------------- */
+
+.character-wrapper {
+  position: relative;
+  width: 290px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.character-shadow {
+  position: absolute;
+  bottom: 22px;
+  width: 170px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(37, 52, 35, 0.22) 0%, rgba(37, 52, 35, 0) 70%);
+  filter: blur(4px);
+}
+
+/* Main Mascot Head */
+.character {
+  position: relative;
+  width: 204px;
+  height: 196px;
+  border-radius: 50% 50% 46% 46% / 54% 54% 44% 44%;
+  background: radial-gradient(circle at 40% 30%, #eaf2e3 0%, #d5e2cb 65%, #c5d4ba 100%);
+  border: 2.5px solid #b8c8ad;
+  box-shadow:
+    inset 0 -12px 16px rgba(82, 110, 74, 0.12),
+    inset 0 6px 12px rgba(255, 255, 255, 0.6),
+    0 20px 35px rgba(38, 55, 36, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Little Tuft of Hair on Top */
+.character-tuft {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.tuft-hair {
+  width: 12px;
+  height: 18px;
+  background: #d5e2cb;
+  border: 2px solid #b8c8ad;
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-15deg);
+  margin-right: -4px;
+}
+
+.tuft-hair:nth-child(2) {
+  height: 22px;
+  transform: rotate(10deg);
+}
+
+/* Ears with Soft Inner Pads */
+.character-ear {
+  position: absolute;
+  top: -18px;
+  width: 58px;
+  height: 60px;
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 40% 30%, #e2ecd9 0%, #cad8bf 100%);
+  border: 2.5px solid #b8c8ad;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ear-inner {
+  width: 32px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f3d4ce 0%, #eac2bb 100%);
+  opacity: 0.85;
+}
+
+.ear-left {
+  left: 12px;
+  transform: rotate(-24deg);
+}
+
+.ear-right {
+  right: 12px;
+  transform: rotate(24deg);
+}
+
+/* Face Frame */
+.character-face {
+  position: absolute;
+  inset: 18px 16px;
+  border-radius: 46% 46% 44% 44% / 50% 50% 45% 45%;
+  background: #ffffff;
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.02),
+    inset 0 4px 8px rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+}
+
+/* Eyes Container */
+.character-eyes {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  top: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Glossy 3D Eye Sockets */
+.eye {
+  width: 36px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid #202620;
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.08),
+    0 2px 5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Pupil with Gloss Catchlights */
+.pupil {
+  width: 17px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #2a3329 0%, #151a14 100%);
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.pupil-highlight-large {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.pupil-highlight-small {
+  position: absolute;
+  bottom: 4px;
+  right: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Closed Eyes Happy Curves */
+.closed-eyes {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  top: 56px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.closed-eye-arc {
+  width: 36px;
+  height: 14px;
+  border-radius: 50%;
+  border-top: 4px solid #202620;
+  background: transparent;
+}
+
+/* Snout & Nose */
+.character-snout {
+  position: absolute;
+  left: 50%;
+  top: 76px;
+  transform: translateX(-50%);
+  width: 58px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #f4f8ee 0%, #e2ecd9 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.character-nose {
+  width: 15px;
+  height: 10px;
+  border-radius: 50% 50% 60% 60%;
+  background: #202620;
+  margin-top: 4px;
+  position: relative;
+}
+
+.nose-shine {
+  position: absolute;
+  top: 1.5px;
+  left: 3px;
+  width: 5px;
+  height: 2.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Mouth */
+.character-mouth {
+  margin-top: 2px;
+  border: 2.5px solid #202620;
+  border-top: 0;
+  background: #c54f57;
+  transition: all 0.2s ease;
+}
+
+/* Cheeks / Blush */
+.blush {
+  position: absolute;
+  top: 86px;
+  width: 28px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(235, 120, 110, 0.55) 0%, rgba(235, 120, 110, 0) 75%);
+  filter: blur(1px);
+}
+
+.blush-left { left: 14px; }
+.blush-right { right: 14px; }
+
+/* Adorable Paws / Hands with Paw Pads */
+.paw {
+  position: absolute;
+  top: 72px;
+  width: 74px;
+  height: 84px;
+  border-radius: 46% 46% 42% 42%;
+  background: radial-gradient(circle at 50% 30%, #e8f0e0 0%, #d0dec4 100%);
+  border: 2.5px solid #b8c8ad;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+}
+
+.paw-toes {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.paw-toe {
+  width: 10px;
+  height: 12px;
+  border-radius: 50%;
+  background: #f1cbc5;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.paw-main-pad {
+  width: 24px;
+  height: 19px;
+  border-radius: 50% 50% 46% 46%;
+  background: #f1cbc5;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.paw-left { left: -26px; }
+.paw-right { right: -26px; }
+
+/* Sparkles on Success */
+.sparkle {
+  position: absolute;
+  color: #228b22;
+  font-size: 26px;
+  font-weight: 800;
+  z-index: 20;
+  text-shadow: 0 0 10px rgba(34, 139, 34, 0.4);
+}
+
+.sparkle-1 { left: -15px; top: 20px; }
+.sparkle-2 { right: -15px; top: 40px; }
+.sparkle-3 { left: 50%; top: -20px; transform: translateX(-50%); font-size: 20px; }
+
+/* Mascot Message */
+.character-message {
+  min-height: 26px;
+  margin: 4px 0 0;
+  color: #5d6756;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #879080;
+  font-size: 12px;
+}
+
+.footer-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #aeb8a8;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Form Panel                                                                 */
+/* -------------------------------------------------------------------------- */
+
+.form-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 68px;
+  background: #ffffff;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+}
+
+.form-heading {
+  margin-bottom: 34px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #228b22;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.form-heading h2 {
+  margin: 0 0 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.form-heading > p:last-child {
+  margin: 0;
+  color: #7a8076;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label,
+.password-label label {
+  color: #343a33;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.password-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #228b22;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.forgot-button:hover {
+  text-decoration: underline;
+}
+
+.input-wrapper {
+  position: relative;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #dfe2db;
+  border-radius: 14px;
+  background: #fbfcf9;
+  transition: all 180ms ease;
+}
+
+.input-wrapper:focus-within,
+.input-wrapper.focused {
+  border-color: #228b22;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(34, 139, 34, 0.1);
+}
+
+.input-icon {
+  flex: 0 0 auto;
+  margin-left: 16px;
+  color: #92998e;
+}
+
+.input-wrapper input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0 15px;
+  background: transparent;
+  color: #20251f;
+  font-family: inherit;
+  font-size: 14.5px;
+}
+
+.input-wrapper input::placeholder {
+  color: #aeb4aa;
+}
+
+.password-toggle {
+  width: 40px;
+  height: 40px;
+  margin-right: 6px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #8a9186;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.password-toggle:hover {
+  color: #228b22;
+  background: #f0f5ed;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -6px;
+  color: #b44b43;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.login-button {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #228b22 0%, #1c741c 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(34, 139, 34, 0.22);
+  transition: all 180ms ease;
+}
+
+.login-button:hover:not(:disabled) {
+  box-shadow: 0 11px 26px rgba(34, 139, 34, 0.32);
+  transform: translateY(-1px);
+}
+
+.login-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.login-button.success {
+  background: #2f8f45;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 0 18px;
+}
+
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: #e8eae5;
+}
+
+.divider p {
+  margin: 0;
+  color: #a0a69d;
+  font-size: 11px;
+}
+
+.create-account {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #858b82;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.create-account strong {
+  margin-left: 5px;
+  color: #228b22;
+}
+
+.create-account:hover strong {
+  text-decoration: underline;
+}
+
+.security-note {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #a0a69d;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.mobile-brand {
+  display: none;
+}
+
+@media (max-width: 850px) {
+  .login-page {
+    padding: 16px;
+  }
+  .login-container {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .character-panel {
+    display: none;
+  }
+  .form-panel {
+    min-height: 640px;
+    padding: 40px 24px;
+  }
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 35px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+  }
+  .security-note {
+    bottom: 18px;
+  }
+}
