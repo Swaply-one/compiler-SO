@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Check, ArrowRight, Eye, EyeOff, AlertCircle, RefreshCw, XCircle, Volume2, VolumeX, AlertTriangle, Sparkles, Tv, Zap, Terminal } from "lucide-react";
+import TerminalCyberBotCompanion from "../components/mascots/TerminalCyberBotCompanion";
+import MatrixHelloBossTransition from "../components/MatrixHelloBossTransition";
 
 // Web Audio Synthesizer with rich audio effects
 class TerminalAudioEngine {
@@ -263,7 +265,7 @@ class TerminalAudioEngine {
 
 const terminalAudio = new TerminalAudioEngine();
 
-export default function Page_RetroCRTTerminal() {
+export default function Page_RetroCRTTerminal({ onReplayIntro }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -272,17 +274,28 @@ export default function Page_RetroCRTTerminal() {
   const [matrixRain, setMatrixRain] = useState(true);
   const [easterEggActive, setEasterEggActive] = useState(false);
 
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [username, setUsername] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+  const [isRobotKicking, setIsRobotKicking] = useState(false);
+  const [isNewUserRegistration, setIsNewUserRegistration] = useState(false);
+
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isCompiling, setIsCompiling] = useState(false);
   const [compileStep, setCompileStep] = useState(0);
   const [authSuccess, setAuthSuccess] = useState(false);
+  const [showHelloBossTransition, setShowHelloBossTransition] = useState(false);
   const [errorDetails, setErrorDetails] = useState(null);
   const [shakeKey, setShakeKey] = useState(0);
 
   const canvasRef = useRef(null);
+  const usernameInputRef = useRef(null);
   const emailInputRef = useRef(null);
   const passwordInputRef = useRef(null);
+  const confirmPasswordInputRef = useRef(null);
 
   useEffect(() => {
     terminalAudio.enabled = soundEnabled;
@@ -361,12 +374,12 @@ export default function Page_RetroCRTTerminal() {
   };
 
   const asciiBanner = `
- ███████╗██╗    ██╗ █████╗ ██████╗ ██╗  ██╗   ██████╗ ███╗   ██╗███████╗
- ██╔════╝██║    ██║██╔══██╗██╔══██╗██║  ██║  ██╔═══██╗████╗  ██║██╔════╝
- ███████╗██║ █╗ ██║███████║██████╔╝███████║  ██║   ██║██╔██╗ ██║█████╗  
- ╚════██║██║███╗██║██╔══██║██╔═══╝ ╚════██║  ██║   ██║██║╚██╗██║██╔══╝  
- ███████║╚███╔███╔╝██║  ██║██║          ██║  ╚██████╔╝██║ ╚████║███████╗
- ╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝          ╚═╝   ╚═════╝ ╚═╝  ╚═══╝╚══════╝
+ ███████╗██╗    ██╗ █████╗ ██████╗ ██╗     ██╗   ██╗   ██████╗ ███╗   ██╗███████╗
+ ██╔════╝██║    ██║██╔══██╗██╔══██╗██║     ╚██╗ ██╔╝  ██╔═══██╗████╗  ██║██╔════╝
+ ███████╗██║ █╗ ██║███████║██████╔╝██║      ╚████╔╝   ██║   ██║██╔██╗ ██║█████╗  
+ ╚════██║██║███╗██║██╔══██║██╔═══╝ ██║       ╚██╔╝    ██║   ██║██║╚██╗██║██╔══╝  
+ ███████║╚███╔███╔╝██║  ██║██║     ███████╗   ██║     ╚██████╔╝██║ ╚████║███████╗
+ ╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝     ╚══════╝   ╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚══════╝
                     [ SWAPLY ONE COMPILER v1.0.0 ]`;
 
   const validateEmail = (val) => {
@@ -466,7 +479,7 @@ export default function Page_RetroCRTTerminal() {
       terminalAudio.playErrorAlarm();
       passwordInputRef.current?.focus();
       setErrorDetails({
-        title: "CIPHER_ERROR: KEY_ENTROPY_INSUFFICIENT",
+        title: "WRONG PASSWORD: KEY_ENTROPY_INSUFFICIENT",
         code: "ERR_0x02_SHORT_KEY",
         targetField: "PASSWORD",
         reasons: [
@@ -484,6 +497,7 @@ export default function Page_RetroCRTTerminal() {
 
     const isValidCredential =
       email.includes("@swaply.io") ||
+      password === "swaply123" ||
       password.includes("llvm") ||
       password.includes("compiler") ||
       password.includes("2026") ||
@@ -495,12 +509,12 @@ export default function Page_RetroCRTTerminal() {
       setShakeKey((prev) => prev + 1);
       terminalAudio.playErrorAlarm();
       setErrorDetails({
-        title: "AUTH_REJECTED: UNRECOGNIZED_CREDENTIALS",
+        title: "WRONG PASSWORD: AUTH_REJECTED",
         code: "ERR_0x03_VAULT_MISMATCH",
-        targetField: "BOTH",
+        targetField: "PASSWORD",
         reasons: [
-          `Developer identity '${email}' not found in compiler registry.`,
-          "Click '[ AUTO-FILL DEMO ACCOUNT ]' to load certified developer credentials.",
+          `WRONG PASSWORD: Incorrect passkey provided for user '${email}'.`,
+          "Click '[ AUTO-FILL DEMO ACCOUNT ]' to load valid credentials (Password: 'swaply123').",
         ],
       });
       return;
@@ -512,7 +526,91 @@ export default function Page_RetroCRTTerminal() {
 
     setIsCompiling(false);
     setAuthSuccess(true);
+    setShowHelloBossTransition(true);
     terminalAudio.playSuccessChime();
+  };
+
+  const handleSignUp = async (e) => {
+    if (e) e.preventDefault();
+    if (isCompiling) return;
+    setErrorDetails(null);
+
+    if (!username.trim() || username.length < 3) {
+      setShakeKey((k) => k + 1);
+      terminalAudio.playErrorAlarm();
+      setErrorDetails({
+        title: "WRONG HANDLE: INVALID_SYNTAX",
+        code: "ERR_0x04_BAD_HANDLE",
+        targetField: "BOTH",
+        reasons: ["Developer handle must contain at least 3 characters."],
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      setShakeKey((k) => k + 1);
+      terminalAudio.playErrorAlarm();
+      setErrorDetails({
+        title: "WRONG EMAIL: INVALID_SYNTAX",
+        code: "ERR_0x01_BAD_EMAIL",
+        targetField: "EMAIL",
+        reasons: ["Workspace email must follow standard RFC-5322 format."],
+      });
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setShakeKey((k) => k + 1);
+      terminalAudio.playErrorAlarm();
+      setErrorDetails({
+        title: "SECURITY REJECTED: LOW ENTROPY",
+        code: "ERR_0x02_LOW_ENTROPY",
+        targetField: "PASSWORD",
+        reasons: ["Master security key must be at least 6 characters."],
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setShakeKey((k) => k + 1);
+      terminalAudio.playErrorAlarm();
+      setErrorDetails({
+        title: "WRONG PASSKEY: MISMATCH DETECTED",
+        code: "ERR_0x05_PASSKEY_MISMATCH",
+        targetField: "PASSWORD",
+        reasons: ["Master security key and confirmation passkey do not match."],
+      });
+      return;
+    }
+
+    // Account creation compiler simulation
+    setIsCompiling(true);
+    setCompileStep(1);
+    terminalAudio.playKeypress();
+    await new Promise((r) => setTimeout(r, 250));
+
+    setCompileStep(2);
+    await new Promise((r) => setTimeout(r, 300));
+
+    setCompileStep(3);
+    await new Promise((r) => setTimeout(r, 250));
+
+    setCompileStep(4);
+    setIsCompiling(false);
+    setIsNewUserRegistration(true);
+    setAuthSuccess(true);
+    setShowHelloBossTransition(true);
+    terminalAudio.playSuccessChime();
+  };
+
+  const toggleMode = (targetSignUp) => {
+    setIsRobotKicking(true);
+    terminalAudio.playKeypress();
+    setErrorDetails(null);
+    setTimeout(() => {
+      setIsSignUp(targetSignUp);
+      setTimeout(() => setIsRobotKicking(false), 380);
+    }, 200);
   };
 
   const handleReset = () => {
@@ -520,6 +618,7 @@ export default function Page_RetroCRTTerminal() {
     setIsCompiling(false);
     setCompileStep(0);
     setPassword("");
+    setConfirmPassword("");
     setErrorDetails(null);
     terminalAudio.playKeypress();
   };
@@ -552,12 +651,13 @@ export default function Page_RetroCRTTerminal() {
     <main
       className="terminal-page-wrapper"
       style={{
-        minHeight: "100vh",
+        height: "100dvh",
+        maxHeight: "100dvh",
         backgroundColor: "#070a07",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "16px 12px",
+        padding: "clamp(4px, 1vh, 12px) clamp(8px, 2vw, 16px)",
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
         color: "#4ade80",
         boxSizing: "border-box",
@@ -594,6 +694,17 @@ export default function Page_RetroCRTTerminal() {
         />
       )}
 
+      {/* Fullscreen Matrix "HELLO BOSS" Cyber Transition Overlay */}
+      <AnimatePresence>
+        {showHelloBossTransition && (
+          <MatrixHelloBossTransition
+            userEmail={email || "developer@swaply.io"}
+            isNewUser={isNewUserRegistration}
+            onComplete={() => setShowHelloBossTransition(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Easter Egg Overlay Notification */}
       <AnimatePresence>
         {easterEggActive && (
@@ -607,52 +718,79 @@ export default function Page_RetroCRTTerminal() {
               zIndex: 100,
               backgroundColor: "#22c55e",
               color: "#051105",
-              padding: "10px 20px",
+              padding: "8px 16px",
               borderRadius: "6px",
               fontWeight: 800,
-              fontSize: "13px",
+              fontSize: "12px",
               boxShadow: "0 0 30px rgba(34, 197, 94, 0.8)",
               display: "flex",
               alignItems: "center",
               gap: "8px",
             }}
           >
-            <Sparkles size={16} />
+            <Sparkles size={15} />
             <span>🎉 CYBERPUNK EASTER EGG UNLOCKED: MAXIMUM HACKER VIBE ACTIVATED! 🎉</span>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Precision-Engineered ASCII Terminal Card */}
-      <motion.div
-        key={shakeKey}
-        initial={{ opacity: 0, y: 16 }}
-        animate={
-          shakeKey > 0
-            ? { x: [-12, 12, -8, 8, -4, 4, 0], opacity: 1, y: 0 }
-            : { opacity: 1, y: 0 }
-        }
-        transition={{ duration: 0.35, ease: "easeOut" }}
+      {/* Centered Main Layout with Live CyberBot Companion (Never Disappears!) */}
+      <div
         style={{
-          width: "100%",
-          maxWidth: "630px",
-          backgroundColor: "#0d130d",
-          border: errorDetails ? "2px solid #ef4444" : "1.5px solid #22c55e",
-          borderRadius: "8px",
-          boxShadow: errorDetails
-            ? "0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(239, 68, 68, 0.5)"
-            : "0 25px 70px rgba(0, 0, 0, 0.9), 0 0 35px -5px rgba(34, 197, 94, 0.3)",
-          padding: "clamp(20px, 4vw, 32px)",
           display: "flex",
           flexDirection: "column",
-          gap: "clamp(18px, 3vw, 24px)",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          maxWidth: "600px",
           position: "relative",
           zIndex: 10,
-          overflow: "hidden",
-          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-          boxSizing: "border-box",
+          gap: "clamp(2px, 0.6vh, 6px)",
+          padding: 0,
+          maxHeight: "100%",
         }}
       >
+        {/* The Live CyberBot Companion */}
+        <TerminalCyberBotCompanion
+          isPasswordFocused={isPasswordFocused || isConfirmPasswordFocused}
+          isEmailFocused={isEmailFocused || isUsernameFocused}
+          isCompiling={isCompiling}
+          errorDetails={errorDetails}
+          authSuccess={authSuccess}
+          isRobotKicking={isRobotKicking}
+          userEmail={email}
+        />
+
+        {/* Precision-Engineered ASCII Terminal Card */}
+        <motion.div
+          key={shakeKey}
+          initial={{ opacity: 0, y: 12 }}
+          animate={
+            shakeKey > 0
+              ? { x: [-10, 10, -6, 6, -3, 3, 0], opacity: 1, y: 0 }
+              : { opacity: 1, y: 0 }
+          }
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          style={{
+            width: "100%",
+            maxWidth: "600px",
+            backgroundColor: "#0d130d",
+            border: errorDetails ? "2px solid #ef4444" : "1.5px solid #22c55e",
+            borderRadius: "8px",
+            boxShadow: errorDetails
+              ? "0 20px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(239, 68, 68, 0.5)"
+              : "0 20px 60px rgba(0, 0, 0, 0.9), 0 0 25px -5px rgba(34, 197, 94, 0.3)",
+            padding: "clamp(10px, 1.4vh, 18px) clamp(12px, 3vw, 22px)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(6px, 1.1vh, 12px)",
+            position: "relative",
+            zIndex: 10,
+            overflow: "hidden",
+            transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+            boxSizing: "border-box",
+          }}
+        >
         {/* Top Header Bar with Vibe Controls */}
         <div
           style={{
@@ -754,6 +892,30 @@ export default function Page_RetroCRTTerminal() {
               {soundEnabled ? <Volume2 size={11} color="#22c55e" /> : <VolumeX size={11} />}
               <span>{soundEnabled ? "SFX" : "MUTE"}</span>
             </button>
+
+            {onReplayIntro && (
+              <button
+                type="button"
+                title="Replay Robot Setup Animation"
+                onClick={onReplayIntro}
+                style={{
+                  background: "rgba(34, 197, 94, 0.2)",
+                  border: "1px solid rgba(34, 197, 94, 0.4)",
+                  borderRadius: "4px",
+                  padding: "4px 8px",
+                  color: "#86efac",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "10px",
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  boxShadow: "0 0 10px rgba(34, 197, 94, 0.2)",
+                }}
+              >
+                <span>🤖 ROBOT BOOT</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -785,7 +947,7 @@ export default function Page_RetroCRTTerminal() {
           </div>
         </div>
 
-        {/* Dynamic State: Success View OR Login Form */}
+        {/* Dynamic State: Success View OR Login/SignUp Form */}
         <AnimatePresence mode="wait">
           {authSuccess ? (
             /* Success Card View */
@@ -798,25 +960,26 @@ export default function Page_RetroCRTTerminal() {
                 backgroundColor: "rgba(34, 197, 94, 0.08)",
                 border: "1.5px solid #22c55e",
                 borderRadius: "6px",
-                padding: "clamp(16px, 3.5vw, 24px)",
+                padding: "clamp(12px, 2.5vw, 18px)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "12px",
+                gap: "10px",
                 boxShadow: "0 0 25px rgba(34, 197, 94, 0.2)",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#4ade80", fontSize: "clamp(13px, 3.2vw, 14.5px)", fontWeight: 700, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#4ade80", fontSize: "clamp(12.5px, 2.8vw, 14px)", fontWeight: 700, flexWrap: "wrap" }}>
                 <Check size={18} strokeWidth={2.5} color="#22c55e" />
-                <span>AUTHENTICATION GRANTED // ACCESS AUTHORIZED</span>
+                <span>{isNewUserRegistration ? "ACCOUNT CREATED // DEVELOPER REGISTERED" : "AUTHENTICATION GRANTED // ACCESS AUTHORIZED"}</span>
               </div>
 
-              <div style={{ fontSize: "12px", lineHeight: "1.7", color: "#dcfce7", wordBreak: "break-all" }}>
-                <div>• DEVELOPER_USER: <strong style={{ color: "#4ade80" }}>{email}</strong></div>
+              <div style={{ fontSize: "11.5px", lineHeight: "1.6", color: "#dcfce7", wordBreak: "break-all" }}>
+                {isNewUserRegistration && <div>• DEVELOPER_HANDLE: <strong style={{ color: "#4ade80" }}>{username || "@swaply_dev"}</strong></div>}
+                <div>• DEVELOPER_EMAIL: <strong style={{ color: "#4ade80" }}>{email}</strong></div>
                 <div>• SESSION_TOKEN: <strong style={{ color: "#4ade80" }}>0x9AF4_2048_AUTH_ACTIVE</strong></div>
-                <div>• BUILD_STATUS: <strong style={{ color: "#4ade80" }}>0 ERRORS, 0 WARNINGS</strong></div>
+                <div>• VAULT_STATUS: <strong style={{ color: "#4ade80" }}>ENCRYPTED (ARGON2id)</strong></div>
               </div>
 
-              <div style={{ marginTop: "4px" }}>
+              <div style={{ marginTop: "2px" }}>
                 <button
                   type="button"
                   onClick={handleReset}
@@ -825,37 +988,50 @@ export default function Page_RetroCRTTerminal() {
                     color: "#051105",
                     border: 0,
                     borderRadius: "4px",
-                    padding: "10px 18px",
+                    padding: "8px 16px",
                     fontWeight: 700,
                     fontFamily: "inherit",
-                    fontSize: "12px",
+                    fontSize: "11.5px",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
+                    gap: "6px",
                     boxShadow: "0 0 15px rgba(34, 197, 94, 0.4)",
                   }}
                 >
-                  <RefreshCw size={13} />
+                  <RefreshCw size={12} />
                   <span>[ RESET / SIGN IN AGAIN ]</span>
                 </button>
               </div>
             </motion.div>
           ) : (
-            /* Main Form */
+            /* Main Form (Sign In OR Sign Up with Robot Kick-Out Transition) */
             <motion.form
-              key="form-view"
-              onSubmit={handleLogin}
-              style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}
+              key={isSignUp ? "signup-form" : "signin-form"}
+              initial={{ x: isSignUp ? 300 : -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: isSignUp ? -300 : 300, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              onSubmit={isSignUp ? handleSignUp : handleLogin}
+              style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 1.3vh, 14px)", width: "100%" }}
             >
               {/* Quick Fill Header Pill */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "6px", fontSize: "11px" }}>
-                <span style={{ color: "#86efac", letterSpacing: "0.05em", fontWeight: 600 }}>AUTHENTICATION PROMPT:</span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "6px", fontSize: "10.5px" }}>
+                <span style={{ color: "#86efac", letterSpacing: "0.05em", fontWeight: 700 }}>
+                  {isSignUp ? "REGISTER NEW DEVELOPER:" : "AUTHENTICATION PROMPT:"}
+                </span>
                 <button
                   type="button"
                   onClick={() => {
-                    setEmail("developer@swaply.io");
-                    setPassword("llvm_compiler_2026");
+                    if (isSignUp) {
+                      setUsername("cyber_developer");
+                      setEmail("developer@swaply.io");
+                      setPassword("swaply123");
+                      setConfirmPassword("swaply123");
+                    } else {
+                      setEmail("developer@swaply.io");
+                      setPassword("swaply123");
+                    }
                     setErrorDetails(null);
                     terminalAudio.playKeypress();
                   }}
@@ -864,14 +1040,83 @@ export default function Page_RetroCRTTerminal() {
                     border: "1px solid rgba(34, 197, 94, 0.4)",
                     borderRadius: "3px",
                     color: "#4ade80",
-                    padding: "3px 8px",
-                    fontSize: "10.5px",
+                    padding: "2px 7px",
+                    fontSize: "10px",
                     cursor: "pointer",
                   }}
                 >
-                  [ AUTO-FILL DEMO ACCOUNT ]
+                  {isSignUp ? "[ AUTO-FILL DEMO SIGN-UP ]" : "[ AUTO-FILL DEMO ACCOUNT ]"}
                 </button>
               </div>
+
+              {/* Developer Handle / Username (Only for Sign Up) */}
+              {isSignUp && (
+                <div
+                  style={{
+                    backgroundColor: "#070c07",
+                    border: isUsernameFocused ? "1.5px solid #22c55e" : "1.5px solid rgba(34, 197, 94, 0.4)",
+                    borderRadius: "4px",
+                    padding: "8px 10px",
+                    boxShadow: isUsernameFocused ? "0 0 14px rgba(34, 197, 94, 0.25)" : "none",
+                    transition: "all 0.18s ease",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                    cursor: "text",
+                    boxSizing: "border-box",
+                  }}
+                  onClick={() => usernameInputRef.current?.focus()}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+                    <label
+                      htmlFor="terminal-username"
+                      style={{
+                        fontSize: "10px",
+                        color: isUsernameFocused ? "#22c55e" : "#86efac",
+                        fontWeight: 700,
+                        letterSpacing: "0.06em",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      &gt; DEVELOPER HANDLE (USERNAME)
+                    </label>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ color: "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "13px", flexShrink: 0 }}>
+                      ❯
+                    </span>
+                    <input
+                      ref={usernameInputRef}
+                      id="terminal-username"
+                      type="text"
+                      autoComplete="username"
+                      disabled={isCompiling}
+                      value={username}
+                      onFocus={() => setIsUsernameFocused(true)}
+                      onBlur={() => setIsUsernameFocused(false)}
+                      onKeyDown={handleInputKeyDown}
+                      onChange={(e) => {
+                        setUsername(e.target.value);
+                        setErrorDetails(null);
+                      }}
+                      placeholder="e.g. cyber_developer"
+                      style={{
+                        width: "100%",
+                        background: "transparent",
+                        border: 0,
+                        outline: 0,
+                        color: "#f0fdf4",
+                        fontFamily: "inherit",
+                        fontSize: "13.5px",
+                        padding: 0,
+                        minHeight: "20px",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Email Input Field with Spotlight */}
               <div
@@ -883,7 +1128,7 @@ export default function Page_RetroCRTTerminal() {
                     ? "1.5px solid #22c55e"
                     : "1.5px solid rgba(34, 197, 94, 0.4)",
                   borderRadius: "4px",
-                  padding: "10px 12px",
+                  padding: "8px 10px",
                   boxShadow: isEmailError
                     ? "0 0 20px rgba(239, 68, 68, 0.35)"
                     : isEmailFocused
@@ -892,34 +1137,35 @@ export default function Page_RetroCRTTerminal() {
                   transition: "all 0.18s ease",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "6px",
+                  gap: "4px",
                   cursor: "text",
                   boxSizing: "border-box",
                 }}
                 onClick={() => emailInputRef.current?.focus()}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
                   <label
                     htmlFor="terminal-email"
                     style={{
-                      fontSize: "10.5px",
+                      fontSize: "10px",
                       color: isEmailError ? "#f87171" : isEmailFocused ? "#22c55e" : "#86efac",
                       fontWeight: 700,
                       letterSpacing: "0.06em",
                       cursor: "pointer",
+                      whiteSpace: "nowrap",
                     }}
                   >
-                    &gt; DEVELOPER EMAIL
+                    &gt; {isSignUp ? "WORKSPACE EMAIL" : "DEVELOPER EMAIL"}
                   </label>
                   {isEmailError && (
-                    <span style={{ color: "#ef4444", fontSize: "10.5px", fontWeight: 700 }}>
+                    <span style={{ color: "#ef4444", fontSize: "9.5px", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0 }}>
                       [ ⚠️ EMAIL REQUIRED ]
                     </span>
                   )}
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <span style={{ color: isEmailError ? "#ef4444" : "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "14px", flexShrink: 0 }}>
+                  <span style={{ color: isEmailError ? "#ef4444" : "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "13px", flexShrink: 0 }}>
                     ❯
                   </span>
                   <input
@@ -945,9 +1191,9 @@ export default function Page_RetroCRTTerminal() {
                       outline: 0,
                       color: "#f0fdf4",
                       fontFamily: "inherit",
-                      fontSize: "15px",
+                      fontSize: "13.5px",
                       padding: 0,
-                      minHeight: "22px",
+                      minHeight: "20px",
                     }}
                   />
                 </div>
@@ -963,7 +1209,7 @@ export default function Page_RetroCRTTerminal() {
                     ? "1.5px solid #22c55e"
                     : "1.5px solid rgba(34, 197, 94, 0.4)",
                   borderRadius: "4px",
-                  padding: "10px 12px",
+                  padding: "8px 10px",
                   boxShadow: isPasswordError
                     ? "0 0 20px rgba(239, 68, 68, 0.35)"
                     : isPasswordFocused
@@ -972,32 +1218,33 @@ export default function Page_RetroCRTTerminal() {
                   transition: "all 0.18s ease",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "6px",
+                  gap: "4px",
                   cursor: "text",
                   boxSizing: "border-box",
                 }}
                 onClick={() => passwordInputRef.current?.focus()}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
                   <label
                     htmlFor="terminal-password"
                     style={{
-                      fontSize: "10.5px",
+                      fontSize: "10px",
                       color: isPasswordError ? "#f87171" : isPasswordFocused ? "#22c55e" : "#86efac",
                       fontWeight: 700,
                       letterSpacing: "0.06em",
                       cursor: "pointer",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     &gt; MASTER SECURITY KEY
                   </label>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
                     {isPasswordError ? (
-                      <span style={{ color: "#ef4444", fontSize: "10.5px", fontWeight: 700 }}>
+                      <span style={{ color: "#ef4444", fontSize: "9.5px", fontWeight: 700, whiteSpace: "nowrap" }}>
                         [ ⚠️ KEY REQUIRED ]
                       </span>
                     ) : (
-                      <span style={{ color: entropy.color, fontSize: "10px", fontWeight: 700 }}>
+                      <span style={{ color: entropy.color, fontSize: "9px", fontWeight: 700, whiteSpace: "nowrap" }}>
                         ENTROPY: {entropy.bars} {entropy.label}
                       </span>
                     )}
@@ -1012,29 +1259,31 @@ export default function Page_RetroCRTTerminal() {
                         background: "transparent",
                         border: 0,
                         color: "#4ade80",
-                        fontSize: "10px",
+                        fontSize: "9.5px",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
-                        padding: 0,
+                        gap: "2px",
+                        padding: "0 2px",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
                       }}
                     >
-                      {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
+                      {showPassword ? <EyeOff size={11} /> : <Eye size={11} />}
                       <span>{showPassword ? "[ HIDE ]" : "[ SHOW ]"}</span>
                     </button>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <span style={{ color: isPasswordError ? "#ef4444" : "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "14px", flexShrink: 0 }}>
+                  <span style={{ color: isPasswordError ? "#ef4444" : "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "13px", flexShrink: 0 }}>
                     ❯
                   </span>
                   <input
                     ref={passwordInputRef}
                     id="terminal-password"
                     type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
+                    autoComplete={isSignUp ? "new-password" : "current-password"}
                     disabled={isCompiling}
                     value={password}
                     onFocus={() => setIsPasswordFocused(true)}
@@ -1053,57 +1302,128 @@ export default function Page_RetroCRTTerminal() {
                       outline: 0,
                       color: "#f0fdf4",
                       fontFamily: "inherit",
-                      fontSize: "15px",
+                      fontSize: "13.5px",
                       letterSpacing: showPassword ? "normal" : "0.2em",
                       padding: 0,
-                      minHeight: "22px",
+                      minHeight: "20px",
                     }}
                   />
                 </div>
               </div>
 
+              {/* Confirm Passkey (Only for Sign Up) */}
+              {isSignUp && (
+                <div
+                  style={{
+                    backgroundColor: "#070c07",
+                    border: isConfirmPasswordFocused ? "1.5px solid #22c55e" : "1.5px solid rgba(34, 197, 94, 0.4)",
+                    borderRadius: "4px",
+                    padding: "8px 10px",
+                    boxShadow: isConfirmPasswordFocused ? "0 0 14px rgba(34, 197, 94, 0.25)" : "none",
+                    transition: "all 0.18s ease",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "4px",
+                    cursor: "text",
+                    boxSizing: "border-box",
+                  }}
+                  onClick={() => confirmPasswordInputRef.current?.focus()}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+                    <label
+                      htmlFor="terminal-confirm-password"
+                      style={{
+                        fontSize: "10px",
+                        color: isConfirmPasswordFocused ? "#22c55e" : "#86efac",
+                        fontWeight: 700,
+                        letterSpacing: "0.06em",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      &gt; CONFIRM SECURITY PASSKEY
+                    </label>
+                    {confirmPassword && password && (
+                      <span style={{ color: password === confirmPassword ? "#22c55e" : "#ef4444", fontSize: "9px", fontWeight: 700 }}>
+                        {password === confirmPassword ? "[ MATCHED ✓ ]" : "[ MISMATCH ✕ ]"}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <span style={{ color: "#22c55e", marginRight: "8px", fontWeight: 700, fontSize: "13px", flexShrink: 0 }}>
+                      ❯
+                    </span>
+                    <input
+                      ref={confirmPasswordInputRef}
+                      id="terminal-confirm-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      disabled={isCompiling}
+                      value={confirmPassword}
+                      onFocus={() => setIsConfirmPasswordFocused(true)}
+                      onBlur={() => setIsConfirmPasswordFocused(false)}
+                      onKeyDown={handleInputKeyDown}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        setErrorDetails(null);
+                      }}
+                      placeholder="Re-enter security key to confirm"
+                      style={{
+                        width: "100%",
+                        background: "transparent",
+                        border: 0,
+                        outline: 0,
+                        color: "#f0fdf4",
+                        fontFamily: "inherit",
+                        fontSize: "13.5px",
+                        letterSpacing: showPassword ? "normal" : "0.2em",
+                        padding: 0,
+                        minHeight: "20px",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Diagnostic Error Box */}
               <AnimatePresence>
                 {errorDetails && (
                   <motion.div
-                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: -4 }}
                     style={{
                       backgroundColor: "rgba(220, 38, 38, 0.15)",
-                      border: "2px solid #ef4444",
-                      borderRadius: "6px",
-                      padding: "14px 16px",
+                      border: "1.5px solid #ef4444",
+                      borderRadius: "4px",
+                      padding: "8px 10px",
                       display: "flex",
                       flexDirection: "column",
-                      gap: "8px",
-                      boxShadow: "0 0 30px rgba(239, 68, 68, 0.35)",
+                      gap: "4px",
+                      boxShadow: "0 0 20px rgba(239, 68, 68, 0.3)",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fecaca", fontWeight: 800, fontSize: "12.5px", flexWrap: "wrap" }}>
-                      <AlertTriangle size={17} color="#ef4444" strokeWidth={2.5} />
-                      <span style={{ color: "#f87171", textShadow: "0 0 10px rgba(239, 68, 68, 0.6)" }}>
-                        {errorDetails.title}
-                      </span>
-                      <span style={{ fontSize: "11px", backgroundColor: "#ef4444", color: "#000", padding: "1px 6px", borderRadius: "3px", fontWeight: 700 }}>
-                        {errorDetails.code}
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: "12px", lineHeight: "1.6", color: "#fee2e2", backgroundColor: "rgba(0, 0, 0, 0.3)", padding: "8px 10px", borderRadius: "4px", borderLeft: "3px solid #ef4444" }}>
-                      {errorDetails.reasons.map((r, i) => (
-                        <div key={i} style={{ marginBottom: i < errorDetails.reasons.length - 1 ? "4px" : 0 }}>
-                          • {r}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "2px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#fca5a5", fontWeight: 800, fontSize: "clamp(10px, 2.2vw, 11.5px)" }}>
+                        <AlertTriangle size={13} color="#ef4444" strokeWidth={2.5} />
+                        <span>{errorDetails.title}</span>
+                        <span style={{ fontSize: "9px", backgroundColor: "#ef4444", color: "#000", padding: "1px 4px", borderRadius: "2px", fontWeight: 700 }}>
+                          {errorDetails.code}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
-                          setEmail("developer@swaply.io");
-                          setPassword("llvm_compiler_2026");
+                          if (isSignUp) {
+                            setUsername("cyber_developer");
+                            setEmail("developer@swaply.io");
+                            setPassword("swaply123");
+                            setConfirmPassword("swaply123");
+                          } else {
+                            setEmail("developer@swaply.io");
+                            setPassword("swaply123");
+                          }
                           setErrorDetails(null);
                           terminalAudio.playKeypress();
                         }}
@@ -1112,31 +1432,35 @@ export default function Page_RetroCRTTerminal() {
                           color: "#070c07",
                           border: 0,
                           borderRadius: "3px",
-                          padding: "5px 10px",
-                          fontSize: "11px",
+                          padding: "3px 7px",
+                          fontSize: "9.5px",
                           fontWeight: 800,
                           cursor: "pointer",
                           display: "flex",
                           alignItems: "center",
-                          gap: "5px",
+                          gap: "4px",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        <Sparkles size={12} />
-                        <span>[ FIX WITH 1-CLICK AUTO-FILL ]</span>
+                        <Sparkles size={10} />
+                        <span>[ FIX: AUTO-FILL ]</span>
                       </button>
+                    </div>
+                    <div style={{ fontSize: "10px", color: "#fee2e2", opacity: 0.9 }}>
+                      • {errorDetails.reasons[0] || "Auth key rejected by compiler runtime."}
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Action Button */}
+              {/* Action Submit Button */}
               <motion.button
                 type="submit"
                 disabled={isCompiling}
                 whileHover={!isCompiling ? { scale: 1.01 } : {}}
                 whileTap={!isCompiling ? { scale: 0.99 } : {}}
                 style={{
-                  minHeight: "48px",
+                  minHeight: "42px",
                   marginTop: "2px",
                   backgroundColor: !email || !password ? "rgba(34, 197, 94, 0.2)" : "#22c55e",
                   color: !email || !password ? "#86efac" : "#051105",
@@ -1144,7 +1468,7 @@ export default function Page_RetroCRTTerminal() {
                   borderRadius: "4px",
                   fontWeight: 800,
                   fontFamily: "inherit",
-                  fontSize: "12.5px",
+                  fontSize: "12px",
                   letterSpacing: "0.06em",
                   cursor: isCompiling ? "not-allowed" : "pointer",
                   boxShadow: email && password && !isCompiling ? "0 0 20px rgba(34, 197, 94, 0.4)" : "none",
@@ -1158,14 +1482,41 @@ export default function Page_RetroCRTTerminal() {
                 }}
               >
                 {isCompiling ? (
-                  <span>COMPILING &amp; AUTHENTICATING...</span>
+                  <span>{isSignUp ? "INITIALIZING DEVELOPER ACCOUNT..." : "COMPILING &amp; AUTHENTICATING..."}</span>
                 ) : (
                   <>
-                    <span>COMPILE &amp; ENTER WORKSPACE</span>
-                    <ArrowRight size={15} strokeWidth={2.5} />
+                    <span>{isSignUp ? "INITIALIZE DEVELOPER ACCOUNT" : "COMPILE &amp; ENTER WORKSPACE"}</span>
+                    <ArrowRight size={14} strokeWidth={2.5} />
                   </>
                 )}
               </motion.button>
+
+              {/* Mode Switch Button (Robot Kick-Out Transition) */}
+              <div style={{ textAlign: "center", marginTop: "2px" }}>
+                <button
+                  type="button"
+                  onClick={() => toggleMode(!isSignUp)}
+                  style={{
+                    background: "rgba(13, 19, 13, 0.9)",
+                    border: "1px dashed rgba(34, 197, 94, 0.4)",
+                    borderRadius: "4px",
+                    padding: "4px 10px",
+                    color: "#86efac",
+                    fontSize: "10.5px",
+                    fontWeight: 700,
+                    fontFamily: "inherit",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#22c55e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(34, 197, 94, 0.4)")}
+                >
+                  <span>{isSignUp ? "⬅ ALREADY REGISTERED? SIGN IN" : "🤖 NEW DEVELOPER? CREATE ACCOUNT →"}</span>
+                </button>
+              </div>
             </motion.form>
           )}
         </AnimatePresence>
@@ -1219,6 +1570,7 @@ export default function Page_RetroCRTTerminal() {
           </span>
         </div>
       </motion.div>
+      </div>
     </main>
   );
 }
