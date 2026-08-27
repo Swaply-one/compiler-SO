@@ -19,7 +19,7 @@ import { Columns2, Maximize2, Radio, AlertTriangle } from "lucide-react";
 
 export default function App() {
   const [showIntro, setShowIntro] = useState(false);
-  const [activePage, setActivePage] = useState("dual_view"); // "dual_view" | "page_404" | "network_offline" | "retro_terminal" | "assembled_login"
+  const [activePage, setActivePage] = useState("retro_terminal"); // Main Flagship Retro CRT Terminal Login Page
 
   const renderActivePage = () => {
     switch (activePage) {

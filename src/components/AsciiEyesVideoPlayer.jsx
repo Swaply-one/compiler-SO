@@ -42,7 +42,7 @@ const F = [
 export default function AsciiEyesVideoPlayer({
   onComplete,
   userEmail = "developer@swaply.io",
-  fps = 6,
+  fps = 24,
 }) {
   const [currentFrameIdx, setCurrentFrameIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);

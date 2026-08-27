@@ -719,7 +719,7 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
         {showAsciiEyesVideo && (
           <AsciiEyesVideoPlayer
             userEmail={email || "developer@swaply.io"}
-            fps={6}
+            fps={24}
             onComplete={() => {
               setShowAsciiEyesVideo(false);
               setInWorkspace(true);
