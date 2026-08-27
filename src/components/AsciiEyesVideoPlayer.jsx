@@ -39,15 +39,17 @@ const F = [
   "                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n           ###+++++*+++#+#########-                                                                                                                         -+#+######+#+++++==+####          \n           ##@@@@@@@@@@@@@#@#@@---*      .--                                                                                                       .-       *--.@####@@@@@@@@@@@####          \n           .@@@@@@@@@@@@@@@@@ **.          .-*-*                                                                                              .@ *--.        -**--##@@@@@@@@@@@@##@+.         \n            #@@@@@@@@@@@@@@@.-     .-*-*-**-    --@@                                                                                       +@@*--     -*-*-***   .-.@@@@@@@@@@@@@@@.          \n             @@@@@@@@@@@@@@ * --*  *-**-*--.*-** --@@@#                                                                                 +@@@@-*  ..  *-*-**-- .*-* -.@@@@@@@@@@@@@-           \n             .@@@@@@@@@@@@-*  *-*- -*-*-**- -*--  * @@@@@.                                                                            @@@@@@#-. *-*- .*-*-*-* -*-*  - @@@@@@@@@@@#            \n              +@@@@@@@@@@@.-*  .  -*--   -**.     --@@@@@@@-                                                                        @@@@@@@@ -*  *-. -*-. .*-*      *-@@@@@@@@@@#             \n               +@@@@@@@@@@.*- -*-*-*- *- .*-*-*   *-@@@@@@@@@                                                                     @@@@@@@@@@ *-. ---**- -*  *-*-*   -*##@@@@@@@#              \n                *#@@@@@@@@ *-- -*-*-*-  .-*-*-*   ..@@@@@@@@@@@                                                                 ##@@@@@@@@@@ **. *-*-*--   -*-*-*   --@@@@@@@@#               \n                  @@@@@@@@*.   .*-**-*-**-*-*--    -@@@@@@@@@@@@-                                                              ###@@@@@@@@@@*--. .*-*-**-*-*-**-*     @@@@@@@-                \n                   #@@@@@@@      --*--    -**-     @@@@@@@@@@@@@@#                                                           =@@@@@@@@@@@@@@@      *-*-*.  -*-*-     @@@@@@@                  \n                     @@@@@@@          *-*- - -*.  @@@@@@@@@@@@@@@@@                                                         #@@@@@@@@@@@@@@@@@          .*-- -- -   ##@@@@-                   \n                       @@@@@@# -*-    -*-. *-*--#@@@@@@@@@@@@@@@@@@@                                                       #@@@@@@@@@@@@@@@@@@@-  -.    -*-*  **-* @#@@@*                     \n                         +@@@@@@ -**..  .--*- @@@@@@@@@@@@@@@#+.                                                                +#@@@@@@@@@@@@@@@*.-*-.     -*-- @@@@#                        \n                         .     .*+#+*    *##+#+*-             .                                                                               -*++##+ ..---.  +-                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              \n                                                                                                                                                                                              "
 ];
 
+// Pre-slice active eye lines (lines 20 to 39) once so zero runtime CPU or memory overhead
+const TRIMMED_FRAMES = F.map((frame) => {
+  const allLines = frame.split("\n");
+  return allLines.slice(20, 39).join("\n");
+});
+
 export default function AsciiEyesVideoPlayer({
   onComplete,
   userEmail = "developer@swaply.io",
-  fps = 24,
 }) {
-  const [currentFrameIdx, setCurrentFrameIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [spd, setSpd] = useState(1);
-
+  const preRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
@@ -55,146 +57,54 @@ export default function AsciiEyesVideoPlayer({
     if (onCompleteRef.current) onCompleteRef.current();
   }, []);
 
-  const slower = () => setSpd((s) => Math.max(0.25, s - 0.25));
-  const faster = () => setSpd((s) => Math.min(4, s + 0.25));
-  const toggle = () => setIsPlaying((p) => !p);
-
-  // Play exactly ONE time with auto-transition upon finishing
+  // Hardware-accelerated 60 FPS RAF Playback Engine (Ultra-Fast & Zero-Lag)
   useEffect(() => {
-    let iv;
-    if (isPlaying) {
-      iv = setInterval(() => {
-        setCurrentFrameIdx((prev) => {
-          if (prev >= F.length - 1) {
-            clearInterval(iv);
-            setTimeout(() => {
-              handleFinish();
-            }, 400);
-            return F.length - 1;
-          }
-          return prev + 1;
-        });
-      }, 1000 / (fps * spd));
-    }
+    let animId;
+    let startTime = null;
+    const totalFrames = TRIMMED_FRAMES.length; // 136 frames
+    const durationMs = 2100; // Super fast, punchy 2.1s high-speed video!
+
+    const renderTick = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(1, elapsed / durationMs);
+      const frameIdx = Math.min(totalFrames - 1, Math.floor(progress * totalFrames));
+
+      if (preRef.current) {
+        preRef.current.textContent = TRIMMED_FRAMES[frameIdx];
+      }
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(renderTick);
+      } else {
+        setTimeout(() => {
+          handleFinish();
+        }, 150);
+      }
+    };
+
+    animId = requestAnimationFrame(renderTick);
 
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
         handleFinish();
-      } else if (e.key === " ") {
-        e.preventDefault();
-        setIsPlaying((p) => !p);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      clearInterval(iv);
+      cancelAnimationFrame(animId);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isPlaying, fps, spd, handleFinish]);
-
-  // Format and colorize: trim empty padding lines for true centering, color the full inner spinning pupil in crimson red
-  const renderFormattedFrame = (frameText) => {
-    const allLines = frameText.split("\n");
-    // Extract active eye lines (lines 20 to 39) to eliminate the large empty top/bottom space
-    const activeLines = allLines.slice(20, 39);
-
-    return activeLines.map((line, relativeIdx) => {
-      const actualLineIdx = relativeIdx + 20;
-      // Eye opening lines 23 to 35
-      const isEyeLine = actualLineIdx >= 23 && actualLineIdx <= 35;
-
-      const parts = [];
-      let currentRun = "";
-      let currentIsNeonGreen = null;
-
-      for (let col = 0; col < line.length; col++) {
-        const char = line[col];
-        // Full inner eye aperture bounds:
-        const isLeftPupil = col >= 24 && col <= 78;
-        const isRightPupil = col >= 112 && col <= 168;
-        const isSpinningChar = char === "*" || char === "-" || char === "." || char === "+" || char === "=" || char === ":";
-        const isNeonGreen = isEyeLine && (isLeftPupil || isRightPupil) && isSpinningChar;
-
-        if (currentIsNeonGreen === null) {
-          currentIsNeonGreen = isNeonGreen;
-          currentRun = char;
-        } else if (currentIsNeonGreen === isNeonGreen) {
-          currentRun += char;
-        } else {
-          parts.push(
-            currentIsNeonGreen ? (
-              <span
-                key={`${relativeIdx}-${col}`}
-                style={{
-                  color: "#39ff14",
-                  textShadow: "0 0 8px #ffffff, 0 0 18px #39ff14, 0 0 35px #22c55e, 0 0 70px rgba(57, 255, 20, 0.95), 0 0 100px rgba(34, 197, 94, 0.7)",
-                  fontWeight: 900,
-                }}
-              >
-                {currentRun}
-              </span>
-            ) : (
-              <span
-                key={`${relativeIdx}-${col}`}
-                style={{
-                  color: "#4ade80",
-                  textShadow: "0 0 6px #39ff14, 0 0 16px rgba(34, 197, 94, 0.8)",
-                  fontWeight: 700,
-                }}
-              >
-                {currentRun}
-              </span>
-            )
-          );
-          currentIsNeonGreen = isNeonGreen;
-          currentRun = char;
-        }
-      }
-
-      if (currentRun) {
-        parts.push(
-          currentIsNeonGreen ? (
-            <span
-              key={`${relativeIdx}-end`}
-              style={{
-                color: "#39ff14",
-                textShadow: "0 0 8px #ffffff, 0 0 18px #39ff14, 0 0 35px #22c55e, 0 0 70px rgba(57, 255, 20, 0.95), 0 0 100px rgba(34, 197, 94, 0.7)",
-                fontWeight: 900,
-              }}
-            >
-              {currentRun}
-            </span>
-          ) : (
-            <span
-              key={`${relativeIdx}-end`}
-              style={{
-                color: "#4ade80",
-                textShadow: "0 0 6px #39ff14, 0 0 16px rgba(34, 197, 94, 0.8)",
-                fontWeight: 700,
-              }}
-            >
-              {currentRun}
-            </span>
-          )
-        );
-      }
-
-      return (
-        <React.Fragment key={relativeIdx}>
-          {parts}
-          {"\n"}
-        </React.Fragment>
-      );
-    });
-  };
+  }, [handleFinish]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.35 }}
+      transition={{ duration: 0.25 }}
+      onClick={handleFinish}
       style={{
         position: "fixed",
         inset: 0,
@@ -208,6 +118,7 @@ export default function AsciiEyesVideoPlayer({
         fontFamily: "'Courier New', Courier, monospace",
         overflow: "hidden",
         userSelect: "none",
+        cursor: "pointer",
       }}
     >
       {/* Fullscreen CRT Scanlines Overlay */}
@@ -217,7 +128,8 @@ export default function AsciiEyesVideoPlayer({
           inset: 0,
           pointerEvents: "none",
           zIndex: 5,
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.28) 2px, rgba(0, 0, 0, 0.28) 4px)",
+          background:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.28) 2px, rgba(0, 0, 0, 0.28) 4px)",
         }}
       />
 
@@ -225,7 +137,7 @@ export default function AsciiEyesVideoPlayer({
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.6 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
         style={{
           position: "fixed",
           top: "clamp(24px, 5vh, 48px)",
@@ -243,7 +155,8 @@ export default function AsciiEyesVideoPlayer({
             fontWeight: 900,
             letterSpacing: "0.42em",
             color: "#86efac",
-            textShadow: "0 0 10px rgba(57, 255, 20, 0.9), 0 0 25px rgba(34, 197, 94, 0.7), 0 0 45px rgba(57, 255, 20, 0.5)",
+            textShadow:
+              "0 0 10px rgba(57, 255, 20, 0.9), 0 0 25px rgba(34, 197, 94, 0.7), 0 0 45px rgba(57, 255, 20, 0.5)",
             paddingLeft: "0.42em",
             display: "inline-block",
           }}
@@ -266,22 +179,26 @@ export default function AsciiEyesVideoPlayer({
         }}
       >
         <pre
+          ref={preRef}
           id="screen"
           style={{
             margin: "auto",
             padding: 0,
-            color: "#4ade80",
+            color: "#39ff14",
             fontSize: "min(calc(100vw / 195 * 1.55), calc(100vh / 24 * 0.85))",
             lineHeight: 1.1,
             whiteSpace: "pre",
-            textShadow: "0 0 8px #39ff14, 0 0 20px #22c55e, 0 0 45px rgba(57, 255, 20, 0.85)",
-            filter: "drop-shadow(0 0 20px #39ff14) drop-shadow(0 0 45px rgba(57, 255, 20, 0.8)) drop-shadow(0 0 80px rgba(34, 197, 94, 0.5))",
+            textShadow:
+              "0 0 8px #ffffff, 0 0 18px #39ff14, 0 0 35px #22c55e, 0 0 65px rgba(57, 255, 20, 0.95), 0 0 100px rgba(34, 197, 94, 0.7)",
+            filter:
+              "drop-shadow(0 0 18px #39ff14) drop-shadow(0 0 40px rgba(57, 255, 20, 0.85)) drop-shadow(0 0 70px rgba(34, 197, 94, 0.6))",
             fontFamily: "'Courier New', Courier, monospace",
             textAlign: "center",
             display: "block",
+            fontWeight: 800,
           }}
         >
-          {renderFormattedFrame(F[currentFrameIdx])}
+          {TRIMMED_FRAMES[0]}
         </pre>
       </div>
     </motion.div>
