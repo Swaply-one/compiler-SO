@@ -106,7 +106,7 @@ export default function AsciiEyesVideoPlayer({
 
       const parts = [];
       let currentRun = "";
-      let currentIsRed = null;
+      let currentIsNeonGreen = null;
 
       for (let col = 0; col < line.length; col++) {
         const char = line[col];
@@ -114,50 +114,68 @@ export default function AsciiEyesVideoPlayer({
         const isLeftPupil = col >= 24 && col <= 78;
         const isRightPupil = col >= 112 && col <= 168;
         const isSpinningChar = char === "*" || char === "-" || char === "." || char === "+" || char === "=" || char === ":";
-        const isRed = isEyeLine && (isLeftPupil || isRightPupil) && isSpinningChar;
+        const isNeonGreen = isEyeLine && (isLeftPupil || isRightPupil) && isSpinningChar;
 
-        if (currentIsRed === null) {
-          currentIsRed = isRed;
+        if (currentIsNeonGreen === null) {
+          currentIsNeonGreen = isNeonGreen;
           currentRun = char;
-        } else if (currentIsRed === isRed) {
+        } else if (currentIsNeonGreen === isNeonGreen) {
           currentRun += char;
         } else {
           parts.push(
-            currentIsRed ? (
+            currentIsNeonGreen ? (
               <span
                 key={`${relativeIdx}-${col}`}
                 style={{
-                  color: "#ff2244",
-                  textShadow: "0 0 6px #ff2244, 0 0 16px rgba(255, 34, 68, 0.8)",
+                  color: "#39ff14",
+                  textShadow: "0 0 8px #ffffff, 0 0 18px #39ff14, 0 0 35px #22c55e, 0 0 70px rgba(57, 255, 20, 0.95), 0 0 100px rgba(34, 197, 94, 0.7)",
                   fontWeight: 900,
                 }}
               >
                 {currentRun}
               </span>
             ) : (
-              <span key={`${relativeIdx}-${col}`}>{currentRun}</span>
+              <span
+                key={`${relativeIdx}-${col}`}
+                style={{
+                  color: "#4ade80",
+                  textShadow: "0 0 6px #39ff14, 0 0 16px rgba(34, 197, 94, 0.8)",
+                  fontWeight: 700,
+                }}
+              >
+                {currentRun}
+              </span>
             )
           );
-          currentIsRed = isRed;
+          currentIsNeonGreen = isNeonGreen;
           currentRun = char;
         }
       }
 
       if (currentRun) {
         parts.push(
-          currentIsRed ? (
+          currentIsNeonGreen ? (
             <span
               key={`${relativeIdx}-end`}
               style={{
-                color: "#ff2244",
-                textShadow: "0 0 6px #ff2244, 0 0 16px rgba(255, 34, 68, 0.8)",
+                color: "#39ff14",
+                textShadow: "0 0 8px #ffffff, 0 0 18px #39ff14, 0 0 35px #22c55e, 0 0 70px rgba(57, 255, 20, 0.95), 0 0 100px rgba(34, 197, 94, 0.7)",
                 fontWeight: 900,
               }}
             >
               {currentRun}
             </span>
           ) : (
-            <span key={`${relativeIdx}-end`}>{currentRun}</span>
+            <span
+              key={`${relativeIdx}-end`}
+              style={{
+                color: "#4ade80",
+                textShadow: "0 0 6px #39ff14, 0 0 16px rgba(34, 197, 94, 0.8)",
+                fontWeight: 700,
+              }}
+            >
+              {currentRun}
+            </span>
           )
         );
       }
@@ -224,17 +242,17 @@ export default function AsciiEyesVideoPlayer({
             fontSize: "clamp(13px, 1.8vw, 20px)",
             fontWeight: 900,
             letterSpacing: "0.42em",
-            color: "#ffffff",
-            textShadow: "0 0 10px rgba(255, 34, 68, 0.85), 0 0 25px rgba(255, 34, 68, 0.45)",
+            color: "#86efac",
+            textShadow: "0 0 10px rgba(57, 255, 20, 0.9), 0 0 25px rgba(34, 197, 94, 0.7), 0 0 45px rgba(57, 255, 20, 0.5)",
             paddingLeft: "0.42em",
             display: "inline-block",
           }}
         >
-          THE HUNT BEGINS.
+          AUTHENTICATION GRANTED // NEURAL LINK ACTIVE
         </span>
       </motion.div>
 
-      {/* Perfectly Centered Fullscreen ASCII Screen */}
+      {/* Perfectly Centered Fullscreen ASCII Screen with Intense Neon Green Glow */}
       <div
         style={{
           width: "100vw",
@@ -252,11 +270,12 @@ export default function AsciiEyesVideoPlayer({
           style={{
             margin: "auto",
             padding: 0,
-            color: "#ffffff",
+            color: "#4ade80",
             fontSize: "min(calc(100vw / 195 * 1.55), calc(100vh / 24 * 0.85))",
             lineHeight: 1.1,
             whiteSpace: "pre",
-            textShadow: "0 0 4px rgba(255, 255, 255, 0.9), 0 0 12px rgba(255, 255, 255, 0.35)",
+            textShadow: "0 0 8px #39ff14, 0 0 20px #22c55e, 0 0 45px rgba(57, 255, 20, 0.85)",
+            filter: "drop-shadow(0 0 20px #39ff14) drop-shadow(0 0 45px rgba(57, 255, 20, 0.8)) drop-shadow(0 0 80px rgba(34, 197, 94, 0.5))",
             fontFamily: "'Courier New', Courier, monospace",
             textAlign: "center",
             display: "block",
