@@ -191,9 +191,8 @@ export default function AsciiEyesVideoPlayer({
             fontSize: "clamp(13px, 1.8vw, 20px)",
             fontWeight: 900,
             letterSpacing: "0.42em",
-            color: "#86efac",
-            textShadow:
-              "0 0 10px rgba(57, 255, 20, 0.9), 0 0 25px rgba(34, 197, 94, 0.7), 0 0 45px rgba(57, 255, 20, 0.5)",
+            color: "#ffffff",
+            textShadow: "0 0 10px rgba(255, 34, 68, 0.85), 0 0 25px rgba(255, 34, 68, 0.45)",
             paddingLeft: "0.42em",
             display: "inline-block",
           }}
@@ -201,6 +200,7 @@ export default function AsciiEyesVideoPlayer({
           AUTHENTICATION GRANTED // NEURAL LINK ACTIVE
         </span>
       </motion.div>
+
 
       {/* GPU Hardware-Accelerated 60 FPS Fullscreen Canvas */}
       <canvas
@@ -218,3 +218,4 @@ export default function AsciiEyesVideoPlayer({
     </motion.div>
   );
 }
+
