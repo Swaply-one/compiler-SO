@@ -1,0 +1,420 @@
+/* =========================================================================
+   SwaplyOne - Premium Network Error / Connection Lost Page
+   Minimal, Sophisticated, Developer-Tool Infrastructure Aesthetic
+   Deep Charcoal #060907, Forest Green #228B22, Emerald #4ade80, Off-White #f8fafc
+   ========================================================================= */
+
+:root {
+  --bg-dark:       #060907;
+  --bg-panel:      rgba(10, 15, 12, 0.85);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  --accent-green:  #228B22;
+  --accent-light:  #34d399;
+  --accent-cyber:  #4ade80;
+  --accent-gold:   #c59b63;
+  --accent-red:    #ef4444;
+
+  --text-main:     #f8fafc;
+  --text-muted:    #94a3b8;
+  --text-dim:      #64748b;
+
+  --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+}
+
+.swaply-network-wrapper {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px 48px;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* Atmospheric Ambient Glows & Grid */
+.swaply-network-bg-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 60% 50%, rgba(34, 139, 34, 0.09) 0%, transparent 60%),
+    radial-gradient(circle at 30% 60%, rgba(239, 68, 68, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(74, 222, 128, 0.05) 0%, transparent 45%);
+}
+
+.swaply-network-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-size: 48px 48px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 85%);
+}
+
+/* 3D WebGL Canvas Layer */
+.swaply-network-canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ---------- Top Header Bar ------------------------------------------------ */
+
+.swaply-network-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.swaply-network-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 100px;
+  background: rgba(15, 23, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.network-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  box-shadow: 0 0 10px var(--accent-red);
+  animation: pulse-red-dot 2s infinite ease-in-out;
+}
+
+.network-indicator-dot.is-healthy {
+  background: var(--accent-cyber);
+  box-shadow: 0 0 10px var(--accent-cyber);
+}
+
+.network-indicator-dot.is-reconnecting {
+  background: var(--accent-gold);
+  box-shadow: 0 0 12px var(--accent-gold);
+  animation: pulse-reconnect-dot 0.6s infinite ease-in-out;
+}
+
+@keyframes pulse-red-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+@keyframes pulse-reconnect-dot {
+  0%, 100% { transform: scale(1.4); opacity: 1; }
+  50% { transform: scale(0.8); opacity: 0.6; }
+}
+
+/* ---------- Main Split Layout --------------------------------------------- */
+
+.swaply-network-main {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1360px;
+  margin: auto;
+  padding: 20px 0;
+  pointer-events: none;
+}
+
+/* Left Hero Column */
+.swaply-network-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 580px;
+  pointer-events: auto;
+}
+
+/* Main Heading Typography */
+.swaply-network-heading {
+  font-family: var(--font-sans);
+  font-size: clamp(38px, 5.5vw, 56px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #f8fafc;
+  margin: 0 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heading-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.heading-status-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.heading-status-tag.is-restored {
+  background: rgba(34, 139, 34, 0.15);
+  border-color: rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+}
+
+.swaply-network-support-msg {
+  font-size: clamp(17px, 2.2vw, 20px);
+  font-weight: 700;
+  color: #e2e8f0;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+.swaply-network-desc {
+  font-size: clamp(14px, 1.8vw, 15.5px);
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 32px;
+  max-width: 480px;
+}
+
+/* Action Buttons Container */
+.swaply-network-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-reconnect {
+  background: linear-gradient(135deg, #1b731b, #155e15);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #ffffff;
+  box-shadow:
+    0 4px 20px rgba(34, 139, 34, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-reconnect:hover {
+  background: linear-gradient(135deg, #228B22, #1b731b);
+  border-color: rgba(74, 222, 128, 0.8);
+  box-shadow:
+    0 6px 28px rgba(34, 139, 34, 0.55),
+    0 0 15px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-reconnect:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-reconnect:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Right Diagnostic Terminal Panel */
+.swaply-network-terminal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin-left: auto;
+  border-radius: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.9),
+    0 0 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  pointer-events: auto;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.swaply-network-terminal:hover {
+  border-color: rgba(74, 222, 128, 0.3);
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.95),
+    0 0 35px rgba(34, 139, 34, 0.15);
+}
+
+.terminal-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.terminal-telemetry-body {
+  padding: 18px 20px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.telemetry-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.telemetry-row:last-child {
+  border-bottom: none;
+}
+
+.telemetry-key {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.telemetry-val {
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.telemetry-val.is-ok {
+  color: #4ade80;
+}
+.telemetry-val.is-unreachable {
+  color: #f87171;
+}
+.telemetry-val.is-muted {
+  color: var(--text-muted);
+}
+
+.telemetry-divider-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 12px 0;
+}
+
+.swaply-network-right-space {
+  min-height: 480px;
+  pointer-events: none;
+}
+
+/* Floating Node Tooltip */
+.network-node-tooltip {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: rgba(15, 23, 18, 0.94);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(34, 197, 94, 0.3);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+/* ---------- Bottom Footer ------------------------------------------------- */
+
+.swaply-network-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+@media (max-width: 960px) {
+  .swaply-network-wrapper {
+    padding: 24px 20px;
+  }
+
+  .swaply-network-main {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .swaply-network-hero {
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .heading-tag-row {
+    justify-content: center;
+  }
+
+  .swaply-network-desc {
+    margin: 0 auto 28px;
+  }
+
+  .swaply-network-actions {
+    justify-content: center;
+  }
+
+  .swaply-network-terminal {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .swaply-network-footer {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}

@@ -1,0 +1,371 @@
+/* =========================================================================
+   SwaplyOne - Cinematic Premium Offline / No Internet Page
+   Aesthetic: Quiet, Cinematic, Atmospheric, Minimal, Developer-Focused
+   Deep Charcoal #050806, Forest Green #228B22, Emerald #4ade80, Off-White #f8fafc
+   ========================================================================= */
+
+:root {
+  --bg-dark:       #050806;
+  --border-subtle: rgba(255, 255, 255, 0.07);
+
+  --accent-green:  #228B22;
+  --accent-light:  #34d399;
+  --accent-cyber:  #4ade80;
+  --accent-gold:   #c59b63;
+
+  --text-main:     #f8fafc;
+  --text-muted:    #94a3b8;
+  --text-dim:      #64748b;
+
+  --font-sans:     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+}
+
+.swaply-offline-wrapper {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 32px 48px;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* Cinematic Atmospheric Radial Glows */
+.swaply-offline-bg-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(34, 139, 34, 0.08) 0%, transparent 65%),
+    radial-gradient(circle at 25% 45%, rgba(197, 155, 99, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 75% 55%, rgba(74, 222, 128, 0.05) 0%, transparent 55%);
+}
+
+.swaply-offline-grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-size: 52px 52px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at 50% 50%, black 45%, transparent 85%);
+}
+
+/* 3D WebGL Canvas Layer */
+.swaply-offline-canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Top Header Bar ------------------------------------------------ */
+
+.swaply-offline-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.swaply-offline-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 100px;
+  background: rgba(15, 23, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.offline-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  box-shadow: 0 0 6px var(--text-dim);
+  animation: pulse-offline-dot 3s infinite ease-in-out;
+}
+
+.offline-indicator-dot.is-searching {
+  background: var(--accent-gold);
+  box-shadow: 0 0 12px var(--accent-gold);
+  animation: pulse-search-dot 0.6s infinite ease-in-out;
+}
+
+.offline-indicator-dot.is-restored {
+  background: var(--accent-cyber);
+  box-shadow: 0 0 12px var(--accent-cyber);
+}
+
+@keyframes pulse-offline-dot {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.85); }
+}
+
+@keyframes pulse-search-dot {
+  0%, 100% { transform: scale(1.3); opacity: 1; }
+  50% { transform: scale(0.8); opacity: 0.5; }
+}
+
+/* ---------- Main Split Layout (Left: Hero Typography // Right: Open 3D Space) */
+
+.swaply-offline-main {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 1360px;
+  margin: auto;
+  padding: 24px 0;
+  pointer-events: none;
+}
+
+/* Left Hero Column */
+.swaply-offline-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 560px;
+  pointer-events: auto;
+}
+
+/* Heading Tag */
+.offline-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.offline-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.offline-tag.is-restored {
+  background: rgba(34, 139, 34, 0.15);
+  border-color: rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+}
+
+/* Large Main Heading */
+.swaply-offline-heading {
+  font-family: var(--font-sans);
+  font-size: clamp(42px, 6vw, 68px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: #f8fafc;
+  margin: 0 0 18px;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+}
+
+.swaply-offline-support-primary {
+  font-size: clamp(16px, 2.2vw, 19px);
+  font-weight: 600;
+  color: #cbd5e1;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  line-height: 1.45;
+}
+
+.swaply-offline-support-secondary {
+  font-size: clamp(14px, 1.8vw, 15px);
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 34px;
+}
+
+/* Action Buttons Container */
+.swaply-offline-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-offline-reconnect {
+  background: linear-gradient(135deg, #1b731b, #155e15);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #ffffff;
+  box-shadow:
+    0 4px 20px rgba(34, 139, 34, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-offline-reconnect:hover {
+  background: linear-gradient(135deg, #228B22, #1b731b);
+  border-color: rgba(74, 222, 128, 0.8);
+  box-shadow:
+    0 6px 28px rgba(34, 139, 34, 0.55),
+    0 0 15px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-offline-reconnect:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-offline-reconnect:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-offline-home {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  backdrop-filter: blur(8px);
+}
+
+.btn-offline-home:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-offline-home:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Status Stream Line During Reconnect */
+.offline-status-stream {
+  margin-top: 24px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.offline-status-stream.is-restored {
+  color: #4ade80;
+}
+
+.offline-status-stream.is-failed {
+  color: #f87171;
+}
+
+/* Right Side Open 3D Stage Area */
+.swaply-offline-right-stage {
+  min-height: 480px;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* ---------- Bottom Footer Bar ---------------------------------------------- */
+
+.swaply-offline-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+.offline-footer-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.offline-footer-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 11.5px;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.offline-footer-link:hover {
+  color: #ffffff;
+}
+
+/* ---------- Responsive Layout --------------------------------------------- */
+
+@media (max-width: 960px) {
+  .swaply-offline-wrapper {
+    padding: 24px 20px;
+  }
+
+  .swaply-offline-main {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .swaply-offline-hero {
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .offline-tag-row {
+    justify-content: center;
+  }
+
+  .swaply-offline-support-secondary {
+    margin-bottom: 28px;
+  }
+
+  .swaply-offline-actions {
+    justify-content: center;
+  }
+
+  .offline-status-stream {
+    justify-content: center;
+  }
+
+  .swaply-offline-right-stage {
+    min-height: 240px;
+  }
+
+  .swaply-offline-footer {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
