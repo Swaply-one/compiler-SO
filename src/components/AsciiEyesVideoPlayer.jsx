@@ -67,7 +67,7 @@ export default function AsciiEyesVideoPlayer({
     let animId;
     let startTime = null;
     const totalFrames = PARSED_FRAMES.length; // 136 frames
-    const durationMs = 3000; // EXACTLY 3.0 SECONDS
+    const durationMs = 1000; // EXACTLY 1.0 SECOND (Ultra Fast & Ultra Smooth)
 
     const handleResize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
