@@ -138,12 +138,11 @@ export default function App() {
   };
 
   const navButtons = [
-    { id: "page_server_laptop", label: "≡ƒÆ╗ 3D Laptop & Cable", color: "#38bdf8" },
-    { id: "page_network", label: "≡ƒîÉ 3D Network 503", color: "#f87171" },
-    { id: "page_404", label: "ΓÜí 3D 404 Error", color: "#fbbf24" },
-    { id: "retro_terminal", label: "≡ƒôƒ CRT Terminal", color: "#4ade80" },
-  ];
-
+  { id: "page_server_laptop", label: "💻 3D Laptop & Cable", color: "#38bdf8" },
+  { id: "page_network", label: "🌐 3D Network 503", color: "#f87171" },
+  { id: "page_404", label: "⚡ 3D 404 Error", color: "#fbbf24" },
+  { id: "retro_terminal", label: "📟 CRT Terminal", color: "#4ade80" },
+];
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#060907", color: "#f8fafc" }}>
       {/* Floating Quick Preview Switcher */}
