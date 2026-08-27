@@ -175,7 +175,7 @@ export default function CozyCoffeeMascot({
           {/* Left Eye */}
           <motion.div
             className="eye"
-            style={{ borderColor: "#451a03", width: 34, height: 42 }}
+            style={{ borderColor: "#14532d", width: 34, height: 42 }}
             animate={{
               opacity: state === "cover" || (state === "peek" && !passwordVisible) || isBlinking ? 0 : 1,
               scaleY: isBlinking ? 0.1 : 1,
@@ -185,7 +185,8 @@ export default function CozyCoffeeMascot({
             <motion.div
               className="pupil"
               style={{
-                background: "radial-gradient(circle at 40% 35%, #78350f 0%, #1c1917 100%)",
+                background: "radial-gradient(circle at 40% 35%, #4ade80 0%, #22c55e 55%, #15803d 100%)",
+                boxShadow: "0 0 8px rgba(34, 197, 94, 0.45)",
                 x: eyeX,
                 y: eyeY,
               }}
@@ -198,7 +199,7 @@ export default function CozyCoffeeMascot({
           {/* Right Eye */}
           <motion.div
             className="eye"
-            style={{ borderColor: "#451a03", width: 34, height: 42 }}
+            style={{ borderColor: "#14532d", width: 34, height: 42 }}
             animate={{
               opacity: state === "cover" || (isBlinking && state !== "peek") ? 0 : 1,
               scaleY: isBlinking && state !== "peek" ? 0.1 : 1,
@@ -208,7 +209,8 @@ export default function CozyCoffeeMascot({
             <motion.div
               className="pupil"
               style={{
-                background: "radial-gradient(circle at 40% 35%, #78350f 0%, #1c1917 100%)",
+                background: "radial-gradient(circle at 40% 35%, #4ade80 0%, #22c55e 55%, #15803d 100%)",
+                boxShadow: "0 0 8px rgba(34, 197, 94, 0.45)",
                 x: eyeX,
                 y: eyeY,
               }}

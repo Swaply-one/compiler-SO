@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Check, ArrowRight, Eye, EyeOff, AlertCircle, RefreshCw, XCircle, Volume2, VolumeX, AlertTriangle, Sparkles, Tv, Zap, Terminal } from "lucide-react";
+import { Check, ArrowRight, Eye, EyeOff, AlertCircle, RefreshCw, XCircle, Volume2, VolumeX, AlertTriangle, Sparkles, Tv, Zap, Terminal, ShieldCheck } from "lucide-react";
 import TerminalCyberBotCompanion from "../components/mascots/TerminalCyberBotCompanion";
 import MatrixHelloBossTransition from "../components/MatrixHelloBossTransition";
 import AsciiEyesVideoPlayer from "../components/AsciiEyesVideoPlayer";
+import OtpVerificationGyre from "../components/OtpVerificationGyre";
 import CompilerWorkspace from "../components/compiler/CompilerWorkspace";
 
 // Web Audio Synthesizer with rich audio effects
@@ -291,6 +292,7 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
   const [authSuccess, setAuthSuccess] = useState(false);
   const [showHelloBossTransition, setShowHelloBossTransition] = useState(false);
   const [showAsciiEyesVideo, setShowAsciiEyesVideo] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
   const [inWorkspace, setInWorkspace] = useState(false);
   const [errorDetails, setErrorDetails] = useState(null);
   const [shakeKey, setShakeKey] = useState(0);
@@ -602,8 +604,8 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
     setCompileStep(4);
     setIsCompiling(false);
     setIsNewUserRegistration(true);
-    setAuthSuccess(true);
-    setShowAsciiEyesVideo(true);
+    setAuthSuccess(false);
+    setShowOtpModal(true);
     terminalAudio.playSuccessChime();
   };
 
@@ -725,6 +727,39 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
               setInWorkspace(true);
             }}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Gyre OTP Verification v3 Modal Overlay */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 99999,
+              backgroundColor: "rgba(0, 0, 0, 0.88)",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <OtpVerificationGyre
+              targetIdentity={email || "+1 415 ••• 0142"}
+              expectedCode="4719"
+              onSuccess={() => {
+                setTimeout(() => {
+                  setShowOtpModal(false);
+                  setShowAsciiEyesVideo(true);
+                }, 800);
+              }}
+              onCancel={() => setShowOtpModal(false)}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -951,6 +986,29 @@ export default function Page_RetroCRTTerminal({ onReplayIntro }) {
             >
               <Eye size={11} color="#22c55e" />
               <span>ASCII EYES</span>
+            </button>
+
+            <button
+              type="button"
+              title="Open Gyre 4-Digit OTP Verification"
+              onClick={() => setShowOtpModal(true)}
+              style={{
+                background: "rgba(46, 230, 168, 0.2)",
+                border: "1px solid rgba(46, 230, 168, 0.4)",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                color: "#2ee6a8",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                fontSize: "10px",
+                cursor: "pointer",
+                fontWeight: 700,
+                boxShadow: "0 0 10px rgba(46, 230, 168, 0.2)",
+              }}
+            >
+              <ShieldCheck size={11} color="#2ee6a8" />
+              <span>2FA OTP</span>
             </button>
 
             {onReplayIntro && (

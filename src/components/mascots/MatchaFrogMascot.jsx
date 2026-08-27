@@ -117,70 +117,72 @@ export default function MatchaFrogMascot({
           }}
           animate={success ? { rotate: [-10, 10, -10] } : {}}
         >
-          {/* Eye in socket */}
-          <motion.div
-            className="eye"
-            style={{ width: 38, height: 42, borderColor: "#14532d" }}
-            animate={{
-              opacity: state === "cover" || (state === "peek" && !passwordVisible) || isBlinking ? 0 : 1,
-              scaleY: isBlinking ? 0.1 : 1,
-            }}
-            transition={{ duration: 0.12 }}
-          >
+            {/* Eye in socket */}
             <motion.div
-              className="pupil"
-              style={{
-                background: "radial-gradient(circle at 40% 35%, #15803d 0%, #052e16 100%)",
-                x: eyeX,
-                y: eyeY,
+              className="eye"
+              style={{ width: 38, height: 42, borderColor: "#14532d" }}
+              animate={{
+                opacity: state === "cover" || (state === "peek" && !passwordVisible) || isBlinking ? 0 : 1,
+                scaleY: isBlinking ? 0.1 : 1,
               }}
+              transition={{ duration: 0.12 }}
             >
-              <div className="pupil-highlight-large" />
-              <div className="pupil-highlight-small" />
+              <motion.div
+                className="pupil"
+                style={{
+                  background: "radial-gradient(circle at 40% 35%, #4ade80 0%, #22c55e 55%, #15803d 100%)",
+                  boxShadow: "0 0 8px rgba(34, 197, 94, 0.45)",
+                  x: eyeX,
+                  y: eyeY,
+                }}
+              >
+                <div className="pupil-highlight-large" />
+                <div className="pupil-highlight-small" />
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          style={{
-            position: "absolute",
-            top: -24,
-            right: 14,
-            width: 58,
-            height: 58,
-            borderRadius: "50%",
-            background: "radial-gradient(circle at 35% 30%, #86efac 0%, #22c55e 60%, #16a34a 100%)",
-            border: "2.5px solid #15803d",
-            boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
-            zIndex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          animate={success ? { rotate: [10, -10, 10] } : {}}
-        >
-          {/* Eye in socket */}
           <motion.div
-            className="eye"
-            style={{ width: 38, height: 42, borderColor: "#14532d" }}
-            animate={{
-              opacity: state === "cover" || (isBlinking && state !== "peek") ? 0 : 1,
-              scaleY: isBlinking && state !== "peek" ? 0.1 : 1,
+            style={{
+              position: "absolute",
+              top: -24,
+              right: 14,
+              width: 58,
+              height: 58,
+              borderRadius: "50%",
+              background: "radial-gradient(circle at 35% 30%, #86efac 0%, #22c55e 60%, #16a34a 100%)",
+              border: "2.5px solid #15803d",
+              boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+              zIndex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            transition={{ duration: 0.12 }}
+            animate={success ? { rotate: [10, -10, 10] } : {}}
           >
+            {/* Eye in socket */}
             <motion.div
-              className="pupil"
-              style={{
-                background: "radial-gradient(circle at 40% 35%, #15803d 0%, #052e16 100%)",
-                x: eyeX,
-                y: eyeY,
+              className="eye"
+              style={{ width: 38, height: 42, borderColor: "#14532d" }}
+              animate={{
+                opacity: state === "cover" || (isBlinking && state !== "peek") ? 0 : 1,
+                scaleY: isBlinking && state !== "peek" ? 0.1 : 1,
               }}
+              transition={{ duration: 0.12 }}
             >
-              <div className="pupil-highlight-large" />
-              <div className="pupil-highlight-small" />
+              <motion.div
+                className="pupil"
+                style={{
+                  background: "radial-gradient(circle at 40% 35%, #4ade80 0%, #22c55e 55%, #15803d 100%)",
+                  boxShadow: "0 0 8px rgba(34, 197, 94, 0.45)",
+                  x: eyeX,
+                  y: eyeY,
+                }}
+              >
+                <div className="pupil-highlight-large" />
+                <div className="pupil-highlight-small" />
+              </motion.div>
             </motion.div>
-          </motion.div>
         </motion.div>
 
         {/* Closed Eyes */}

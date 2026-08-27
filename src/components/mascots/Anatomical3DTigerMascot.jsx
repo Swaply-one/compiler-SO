@@ -341,7 +341,7 @@ export default function Anatomical3DTigerMascot({
 
     const leftAmberIris = new THREE.Mesh(
       new THREE.SphereGeometry(0.23, 24, 24),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.1, metalness: 0.2 })
+      new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.1, metalness: 0.2 })
     );
     leftAmberIris.position.set(-0.48, 0.18, 1.34);
     headGroup.add(leftAmberIris);
@@ -356,7 +356,7 @@ export default function Anatomical3DTigerMascot({
 
     const rightAmberIris = new THREE.Mesh(
       new THREE.SphereGeometry(0.23, 24, 24),
-      new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.1, metalness: 0.2 })
+      new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.1, metalness: 0.2 })
     );
     rightAmberIris.position.set(0.48, 0.18, 1.34);
     headGroup.add(rightAmberIris);

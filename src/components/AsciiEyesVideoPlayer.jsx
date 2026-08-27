@@ -146,7 +146,85 @@ export default function AsciiEyesVideoPlayer({
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleFinish]);
+  }, [isPlaying, fps, spd, handleFinish]);
+
+  // Format and colorize: trim empty padding lines for true centering, color the full inner spinning pupil in crimson red
+  const renderFormattedFrame = (frameText) => {
+    const allLines = frameText.split("\n");
+    // Extract active eye lines (lines 20 to 39) to eliminate the large empty top/bottom space
+    const activeLines = allLines.slice(20, 39);
+
+    return activeLines.map((line, relativeIdx) => {
+      const actualLineIdx = relativeIdx + 20;
+      // Eye opening lines 23 to 35
+      const isEyeLine = actualLineIdx >= 23 && actualLineIdx <= 35;
+
+      const parts = [];
+      let currentRun = "";
+      let currentIsRed = null;
+
+      for (let col = 0; col < line.length; col++) {
+        const char = line[col];
+        // Full inner eye aperture bounds:
+        const isLeftPupil = col >= 24 && col <= 78;
+        const isRightPupil = col >= 112 && col <= 168;
+        const isSpinningChar = char === "*" || char === "-" || char === "." || char === "+" || char === "=" || char === ":";
+        const isRed = isEyeLine && (isLeftPupil || isRightPupil) && isSpinningChar;
+
+        if (currentIsRed === null) {
+          currentIsRed = isRed;
+          currentRun = char;
+        } else if (currentIsRed === isRed) {
+          currentRun += char;
+        } else {
+          parts.push(
+            currentIsRed ? (
+              <span
+                key={`${relativeIdx}-${col}`}
+                style={{
+                  color: "#ff2244",
+                  textShadow: "0 0 6px #ff2244, 0 0 16px rgba(255, 34, 68, 0.8)",
+                  fontWeight: 900,
+                }}
+              >
+                {currentRun}
+              </span>
+            ) : (
+              <span key={`${relativeIdx}-${col}`}>{currentRun}</span>
+            )
+          );
+          currentIsRed = isRed;
+          currentRun = char;
+        }
+      }
+
+      if (currentRun) {
+        parts.push(
+          currentIsRed ? (
+            <span
+              key={`${relativeIdx}-end`}
+              style={{
+                color: "#ff2244",
+                textShadow: "0 0 6px #ff2244, 0 0 16px rgba(255, 34, 68, 0.8)",
+                fontWeight: 900,
+              }}
+            >
+              {currentRun}
+            </span>
+          ) : (
+            <span key={`${relativeIdx}-end`}>{currentRun}</span>
+          )
+        );
+      }
+
+      return (
+        <React.Fragment key={relativeIdx}>
+          {parts}
+          {"\n"}
+        </React.Fragment>
+      );
+    });
+  };
 
   return (
     <motion.div
@@ -191,9 +269,8 @@ export default function AsciiEyesVideoPlayer({
             fontSize: "clamp(13px, 1.8vw, 20px)",
             fontWeight: 900,
             letterSpacing: "0.42em",
-            color: "#86efac",
-            textShadow:
-              "0 0 10px rgba(57, 255, 20, 0.9), 0 0 25px rgba(34, 197, 94, 0.7), 0 0 45px rgba(57, 255, 20, 0.5)",
+            color: "#ffffff",
+            textShadow: "0 0 10px rgba(255, 34, 68, 0.85), 0 0 25px rgba(255, 34, 68, 0.45)",
             paddingLeft: "0.42em",
             display: "inline-block",
           }}
@@ -212,8 +289,27 @@ export default function AsciiEyesVideoPlayer({
           position: "absolute",
           inset: 0,
           zIndex: 1,
+          backgroundColor: "#000000",
         }}
-      />
+      >
+        <pre
+          id="screen"
+          style={{
+            margin: "auto",
+            padding: 0,
+            color: "#ffffff",
+            fontSize: "min(calc(100vw / 195 * 1.55), calc(100vh / 24 * 0.85))",
+            lineHeight: 1.1,
+            whiteSpace: "pre",
+            textShadow: "0 0 4px rgba(255, 255, 255, 0.9), 0 0 12px rgba(255, 255, 255, 0.35)",
+            fontFamily: "'Courier New', Courier, monospace",
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          {renderFormattedFrame(F[currentFrameIdx])}
+        </pre>
+      </div>
     </motion.div>
   );
 }

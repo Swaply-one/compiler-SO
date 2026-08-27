@@ -319,7 +319,7 @@ export default function Real3DWebGLTigerMascot({
     const leftAmberIris = new THREE.Mesh(
       new THREE.SphereGeometry(0.24, 24, 24),
       new THREE.MeshStandardMaterial({
-        color: 0xf59e0b,
+        color: 0x22c55e,
         roughness: 0.1,
         metalness: 0.2,
       })
@@ -338,7 +338,7 @@ export default function Real3DWebGLTigerMascot({
     const rightAmberIris = new THREE.Mesh(
       new THREE.SphereGeometry(0.24, 24, 24),
       new THREE.MeshStandardMaterial({
-        color: 0xf59e0b,
+        color: 0x22c55e,
         roughness: 0.1,
         metalness: 0.2,
       })
