@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "motion/react";
 import {
   Play,
@@ -14,11 +14,14 @@ import {
   ChevronRight,
   Code2,
 } from "lucide-react";
+import ComplexityPanel from "./ComplexityPanel";
+import { analyzeComplexity } from "../../services/complexityAnalyzer";
 
 export default function CompilerWorkspace({ userEmail = "developer@swaply.io", onSignOut }) {
   const [activeFile, setActiveFile] = useState("main.sw");
   const [targetArch, setTargetArch] = useState("x86_64-native");
   const [isRunning, setIsRunning] = useState(false);
+  const [activeBottomTab, setActiveBottomTab] = useState("terminal"); // "terminal" | "complexity"
   const [botMessage, setBotMessage] = useState("🤖 Welcome to your Compiler Workspace, Boss! Press [RUN F5] to execute code.");
   const [terminalOutput, setTerminalOutput] = useState([
     "╔═══════════════════════════════════════════════════════════════════════════════╗",
@@ -393,7 +396,7 @@ pub fn main() -> Result<(), std::Error> {
             </div>
           </div>
 
-          {/* Bottom Live Terminal Output */}
+          {/* Bottom Live Terminal Output / Complexity Panel */}
           <div
             style={{
               backgroundColor: "#0D0F0D",
@@ -404,7 +407,7 @@ pub fn main() -> Result<(), std::Error> {
           >
             <div
               style={{
-                height: "32px",
+                height: "36px",
                 backgroundColor: "#151815",
                 borderBottom: "1px solid #292E29",
                 display: "flex",
@@ -414,28 +417,76 @@ pub fn main() -> Result<(), std::Error> {
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "11px",
                 color: "#8D958B",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <Terminal size={13} color="#228B22" />
-                <span>Compiler Output & Diagnostic Terminal</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveBottomTab("terminal")}
+                  style={{
+                    background: activeBottomTab === "terminal" ? "#1B1F1B" : "transparent",
+                    border: activeBottomTab === "terminal" ? "1px solid #292E29" : "1px solid transparent",
+                    color: activeBottomTab === "terminal" ? "#22c55e" : "#8D958B",
+                    padding: "3px 8px",
+                    borderRadius: "4px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <Terminal size={12} color={activeBottomTab === "terminal" ? "#22c55e" : "#8D958B"} />
+                  <span>Output Terminal</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveBottomTab("complexity")}
+                  style={{
+                    background: activeBottomTab === "complexity" ? "rgba(56, 189, 248, 0.15)" : "transparent",
+                    border: activeBottomTab === "complexity" ? "1px solid #38bdf8" : "1px solid transparent",
+                    color: activeBottomTab === "complexity" ? "#38bdf8" : "#8D958B",
+                    padding: "3px 8px",
+                    borderRadius: "4px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  <Cpu size={12} color={activeBottomTab === "complexity" ? "#38bdf8" : "#8D958B"} />
+                  <span>Complexity & Algorithm</span>
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setTerminalOutput(["[terminal] Cleared diagnostic logs."])}
-                style={{
-                  background: "transparent",
-                  border: 0,
-                  color: "#8D958B",
-                  fontSize: "10.5px",
-                  cursor: "pointer",
-                }}
-              >
-                Clear
-              </button>
+
+              {activeBottomTab === "terminal" && (
+                <button
+                  type="button"
+                  onClick={() => setTerminalOutput(["[terminal] Cleared diagnostic logs."])}
+                  style={{
+                    background: "transparent",
+                    border: 0,
+                    color: "#8D958B",
+                    fontSize: "10.5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Clear
+                </button>
+              )}
             </div>
+
+            {activeBottomTab === "complexity" ? (
+              <ComplexityPanel
+                analysis={analyzeComplexity(sourceCode, "rust")}
+                selectedLang="rust"
+                onApplyCode={() => {}}
+                onReAnalyze={() => {}}
+              />
+            ) : (
 
             <div
               style={{
@@ -469,6 +520,7 @@ pub fn main() -> Result<(), std::Error> {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </div>
       </div>

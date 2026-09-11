@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Terminal,
   Play,
@@ -20,8 +20,14 @@ import {
   AlertTriangle,
   Cpu,
   Layers,
+  Sparkles,
+  Activity,
+  HardDrive,
+  Clock,
 } from "lucide-react";
 import SwaplyLogo from "../components/SwaplyLogo";
+import ComplexityPanel from "../components/compiler/ComplexityPanel";
+import { analyzeComplexity } from "../services/complexityAnalyzer";
 
 /**
  * Audio Synthesizer for Hacker Decryption & Compile SFX
@@ -422,6 +428,7 @@ export default function Page_HomeScreen({
   const [splitPercent, setSplitPercent] = useState(50); // 50% editor, 50% output
   const [isDragging, setIsDragging] = useState(false);
   const [reopenNotice, setReopenNotice] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState("terminal"); // "terminal" | "complexity"
 
   // Output Screen State
   const [copiedOutput, setCopiedOutput] = useState(false);
@@ -452,6 +459,17 @@ export default function Page_HomeScreen({
 
   const currentLangObj = LANGUAGES.find((l) => l.id === selectedLang) || LANGUAGES[0];
   const currentCode = userCodes[selectedLang] || "";
+
+  // Static & Algorithmic Complexity Analysis (TASK-02)
+  const complexityAnalysis = useMemo(() => {
+    return analyzeComplexity(currentCode, selectedLang);
+  }, [currentCode, selectedLang]);
+
+  // Apply Suggested Optimization directly into Editor
+  const handleApplySuggestion = (optimizedCode) => {
+    sfx.playSuccess();
+    handleCodeChange(optimizedCode);
+  };
 
   // Sync SFX
   useEffect(() => {
@@ -1261,6 +1279,42 @@ export default function Page_HomeScreen({
 
         {/* Route Navigation Shortcuts & Utilities */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {/* Dedicated Complexity Panel Shortcut Button */}
+          <button
+            onClick={() => {
+              sfx.playClick();
+              setIsOutputOpen(true);
+              setActiveRightTab("complexity");
+            }}
+            style={{
+              padding: "4px 10px",
+              borderRadius: "5px",
+              background:
+                activeRightTab === "complexity" && isOutputOpen
+                  ? "rgba(56, 189, 248, 0.25)"
+                  : "rgba(56, 189, 248, 0.12)",
+              border:
+                activeRightTab === "complexity" && isOutputOpen
+                  ? "1.5px solid #38bdf8"
+                  : "1px solid rgba(56, 189, 248, 0.4)",
+              color: "#38bdf8",
+              fontSize: "11.5px",
+              fontWeight: 800,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              boxShadow:
+                activeRightTab === "complexity" && isOutputOpen
+                  ? "0 0 10px rgba(56, 189, 248, 0.35)"
+                  : "none",
+            }}
+            title="Open Dedicated Complexity & Algorithm Panel"
+          >
+            <Cpu size={13} />
+            <span>🧠 Complexity ({complexityAnalysis.timeComplexity.bigO})</span>
+          </button>
+
           {/* Toggle Output Button (Hide or Show) */}
           {isOutputOpen ? (
             <button
@@ -1733,7 +1787,7 @@ export default function Page_HomeScreen({
               transition: isDragging ? "none" : "width 0.15s ease",
             }}
           >
-            {/* Terminal Header Bar with Tabs, Status, Copy, Clear, and Close (X) */}
+            {/* Right Panel Header Bar with Tabs: Terminal vs Dedicated Complexity Panel */}
             <div
               style={{
                 height: "42px",
@@ -1747,40 +1801,108 @@ export default function Page_HomeScreen({
                 gap: 8,
               }}
             >
-              {/* Left: Terminal Title & Live Status Indicator */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Terminal size={15} style={{ color: "#39ff14" }} />
-                <span
+              {/* Left: Tab Switchers: [ 📟 OUTPUT TERMINAL ] vs [ 🧠 COMPLEXITY & ALGO ] */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {/* Terminal Tab */}
+                <button
+                  onClick={() => {
+                    sfx.playClick();
+                    setActiveRightTab("terminal");
+                  }}
                   style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: "17px",
-                    letterSpacing: "0.08em",
-                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "4px 10px",
+                    borderRadius: "5px",
+                    border:
+                      activeRightTab === "terminal"
+                        ? "1.5px solid #22c55e"
+                        : "1px solid transparent",
+                    background:
+                      activeRightTab === "terminal"
+                        ? "rgba(34, 197, 94, 0.2)"
+                        : "transparent",
+                    color: activeRightTab === "terminal" ? "#ffffff" : "#94a3b8",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
                   }}
                 >
-                  OUTPUT TERMINAL
-                </span>
-                {outputResult.hasRun && (
+                  <Terminal size={14} style={{ color: "#39ff14" }} />
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "16px", letterSpacing: "0.06em" }}>
+                    OUTPUT TERMINAL
+                  </span>
+                  {outputResult.hasRun && (
+                    <span
+                      style={{
+                        fontSize: "9.5px",
+                        padding: "1px 5px",
+                        borderRadius: "3px",
+                        background: outputResult.isError ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
+                        border: outputResult.isError ? "1px solid #ef4444" : "1px solid #22c55e",
+                        color: outputResult.isError ? "#ef4444" : "#39ff14",
+                        fontWeight: 800,
+                      }}
+                    >
+                      {outputResult.isError ? "ERR" : "OK"}
+                    </span>
+                  )}
+                </button>
+
+                {/* Dedicated Complexity & Algorithm Panel Tab */}
+                <button
+                  onClick={() => {
+                    sfx.playClick();
+                    setActiveRightTab("complexity");
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "4px 10px",
+                    borderRadius: "5px",
+                    border:
+                      activeRightTab === "complexity"
+                        ? "1.5px solid #38bdf8"
+                        : "1px solid rgba(56, 189, 248, 0.25)",
+                    background:
+                      activeRightTab === "complexity"
+                        ? "rgba(56, 189, 248, 0.2)"
+                        : "rgba(56, 189, 248, 0.06)",
+                    color: activeRightTab === "complexity" ? "#ffffff" : "#38bdf8",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                  title="View Space Complexity, Time Complexity, Algorithm Used & Optimization Suggestions"
+                >
+                  <Cpu size={14} style={{ color: "#38bdf8" }} />
+                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "16px", letterSpacing: "0.06em" }}>
+                    COMPLEXITY & ALGO
+                  </span>
                   <span
                     style={{
-                      fontSize: "10.5px",
+                      fontSize: "9.5px",
                       padding: "1px 6px",
-                      borderRadius: "4px",
-                      background: outputResult.isError ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
-                      border: outputResult.isError ? "1px solid #ef4444" : "1px solid #22c55e",
-                      color: outputResult.isError ? "#ef4444" : "#39ff14",
+                      borderRadius: "3px",
+                      background: `${complexityAnalysis.timeComplexity.color}25`,
+                      border: `1px solid ${complexityAnalysis.timeComplexity.color}`,
+                      color: complexityAnalysis.timeComplexity.color,
                       fontWeight: 800,
+                      fontFamily: "'JetBrains Mono', monospace",
                     }}
                   >
-                    {outputResult.isError ? "BUILD FAILED" : "LIVE"}
+                    {complexityAnalysis.timeComplexity.bigO}
                   </span>
-                )}
+                </button>
               </div>
 
               {/* Right: Status Pill & Action Buttons */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                {/* Status Pill Badge */}
-                {outputResult.hasRun && (
+                {activeRightTab === "terminal" && outputResult.hasRun && (
                   <span
                     style={{
                       fontSize: "11px",
@@ -1809,48 +1931,52 @@ export default function Page_HomeScreen({
                   </span>
                 )}
 
-                {/* Copy Output Button */}
-                <button
-                  onClick={handleCopyOutput}
-                  title="Copy output to clipboard"
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    background: copiedOutput ? "rgba(34, 197, 94, 0.25)" : "transparent",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                    color: copiedOutput ? "#39ff14" : "#94a3b8",
-                    fontSize: "11px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  {copiedOutput ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copiedOutput ? "Copied" : "Copy"}</span>
-                </button>
+                {activeRightTab === "terminal" && (
+                  <>
+                    {/* Copy Output Button */}
+                    <button
+                      onClick={handleCopyOutput}
+                      title="Copy output to clipboard"
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        background: copiedOutput ? "rgba(34, 197, 94, 0.25)" : "transparent",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        color: copiedOutput ? "#39ff14" : "#94a3b8",
+                        fontSize: "11px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {copiedOutput ? <Check size={12} /> : <Copy size={12} />}
+                      <span>{copiedOutput ? "Copied" : "Copy"}</span>
+                    </button>
 
-                {/* Clear Output Button */}
-                <button
-                  onClick={handleClearOutput}
-                  title="Clear output"
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    background: "transparent",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                    color: "#94a3b8",
-                    fontSize: "11px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 4,
-                  }}
-                >
-                  <RotateCcw size={12} />
-                  <span>Clear</span>
-                </button>
+                    {/* Clear Output Button */}
+                    <button
+                      onClick={handleClearOutput}
+                      title="Clear output"
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        background: "transparent",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        color: "#94a3b8",
+                        fontSize: "11px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      <RotateCcw size={12} />
+                      <span>Clear</span>
+                    </button>
+                  </>
+                )}
 
                 {/* Close Window Button [X] */}
                 <button
@@ -1858,7 +1984,7 @@ export default function Page_HomeScreen({
                     sfx.playClick();
                     setIsOutputOpen(false);
                   }}
-                  title="Close Output Terminal Window"
+                  title="Close Output Panel"
                   style={{
                     padding: "4px 9px",
                     borderRadius: "4px",
@@ -1903,234 +2029,244 @@ export default function Page_HomeScreen({
               </div>
             )}
 
-            {/* Full-Height Output Display Area */}
-            <div
-              style={{
-                flex: 1,
-                padding: "14px 16px",
-                overflowY: "auto",
-                boxSizing: "border-box",
-                background: "#030603",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {/* Case 1: Terminal has not run yet */}
-              {!outputResult.hasRun ? (
+            {/* Right Panel Main Content: Terminal OR Dedicated Complexity Panel */}
+            {activeRightTab === "complexity" ? (
+              <ComplexityPanel
+                analysis={complexityAnalysis}
+                selectedLang={selectedLang}
+                onApplyCode={handleApplySuggestion}
+                onReAnalyze={() => {}}
+              />
+            ) : (
+              /* Full-Height Output Display Area */
+              <div
+                style={{
+                  flex: 1,
+                  padding: "14px 16px",
+                  overflowY: "auto",
+                  boxSizing: "border-box",
+                  background: "#030603",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                {/* Case 1: Terminal has not run yet */}
+                {!outputResult.hasRun ? (
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      color: "#64748b",
+                      textAlign: "center",
+                      padding: "20px",
+                      gap: 10,
+                    }}
+                  >
+                    <Terminal size={36} style={{ color: "rgba(34, 197, 94, 0.4)" }} />
+                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#94a3b8" }}>
+                      Terminal Ready
+                    </div>
+                    <div style={{ fontSize: "12px", maxWidth: "340px", lineHeight: "1.5" }}>
+                      Write or edit your code on the left, then click{" "}
+                      <span style={{ color: "#39ff14", fontWeight: 700 }}>COMPILE & RUN</span> or press{" "}
+                      <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: "3px", color: "#f8fafc" }}>
+                        Ctrl + Enter
+                      </kbd>
+                      .
+                    </div>
+                  </div>
+                ) : outputResult.isError ? (
+                  /* Case 2: Compilation or Runtime Error */
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {/* Error Header Banner */}
                     <div
                       style={{
-                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "8px 12px",
+                        background: "rgba(239, 68, 68, 0.15)",
+                        border: "1px solid #ef4444",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#f87171", fontWeight: 800, fontSize: "12px" }}>
+                        <AlertTriangle size={15} />
+                        <span>BUILD FAILED • PROCESS TERMINATED (EXIT CODE {outputResult.exitCode})</span>
+                      </div>
+                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>{outputResult.compileTime}</span>
+                    </div>
+
+                    {/* Error Card */}
+                    <div
+                      style={{
+                        background: "rgba(15, 23, 42, 0.7)",
+                        border: "1.5px solid rgba(239, 68, 68, 0.4)",
+                        borderRadius: "6px",
+                        padding: "14px",
                         display: "flex",
                         flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        color: "#64748b",
-                        textAlign: "center",
-                        padding: "20px",
                         gap: 10,
                       }}
                     >
-                      <Terminal size={36} style={{ color: "rgba(34, 197, 94, 0.4)" }} />
-                      <div style={{ fontSize: "14px", fontWeight: 700, color: "#94a3b8" }}>
-                        Terminal Ready
+                      <div style={{ color: "#ef4444", fontWeight: 900, fontSize: "13.5px", letterSpacing: "0.02em" }}>
+                        ❌ {outputResult.errorObj?.title || "Compilation Error"}
                       </div>
-                      <div style={{ fontSize: "12px", maxWidth: "340px", lineHeight: "1.5" }}>
-                        Write or edit your code on the left, then click{" "}
-                        <span style={{ color: "#39ff14", fontWeight: 700 }}>COMPILE & RUN</span> or press{" "}
-                        <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: "3px", color: "#f8fafc" }}>
-                          Ctrl + Enter
-                        </kbd>
-                        .
+
+                      {outputResult.errorObj?.sourceLine && (
+                        <div
+                          style={{
+                            background: "#070b08",
+                            padding: "10px 12px",
+                            borderRadius: "4px",
+                            border: "1px solid rgba(239, 68, 68, 0.25)",
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: "12px",
+                            lineHeight: "1.6",
+                            color: "#fca5a5",
+                            whiteSpace: "pre",
+                            overflowX: "auto",
+                          }}
+                        >
+                          <div style={{ color: "#64748b" }}>
+                            {`--> ${selectedLang.toUpperCase()}_SOURCE : Line ${outputResult.errorObj?.line || 1}`}
+                          </div>
+                          <div>
+                            <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                              {outputResult.errorObj?.line || 1} |{" "}
+                            </span>
+                            {outputResult.errorObj?.sourceLine}
+                          </div>
+                          {outputResult.errorObj?.pointer && (
+                            <div style={{ color: "#f87171" }}>
+                              {"    | "}
+                              {outputResult.errorObj?.pointer}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Simple Human-Friendly Explanation */}
+                      {outputResult.errorObj?.explanation && (
+                        <div
+                          style={{
+                            background: "rgba(234, 179, 8, 0.12)",
+                            border: "1px solid rgba(234, 179, 8, 0.4)",
+                            borderRadius: "5px",
+                            padding: "10px 12px",
+                            color: "#fef08a",
+                            fontSize: "12px",
+                            lineHeight: "1.5",
+                          }}
+                        >
+                          <span style={{ fontWeight: 800, color: "#facc15" }}>💡 Simple Explanation: </span>
+                          {outputResult.errorObj.explanation}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Case 3: SUCCESS - Clean Program Output (STDOUT) */
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
+                    {/* Success Summary Ribbon */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "8px 12px",
+                        background: "rgba(34, 197, 94, 0.12)",
+                        border: "1px solid rgba(34, 197, 94, 0.4)",
+                        borderRadius: "6px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#4ade80", fontWeight: 800, fontSize: "12px" }}>
+                        <CheckCircle2 size={15} />
+                        <span>PROGRAM FINISHED SUCCESSFULLY • EXIT CODE 0</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "11px" }}>
+                        <span style={{ color: "#38bdf8", fontWeight: 700 }}>{outputResult.compileTime}</span>
+                        <span style={{ color: "#64748b" }}>•</span>
+                        <span style={{ color: "#94a3b8" }}>{outputResult.memory}</span>
                       </div>
                     </div>
-                  ) : outputResult.isError ? (
-                    /* Case 2: Compilation or Runtime Error */
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      {/* Error Header Banner */}
+
+                    {/* Clear Monospace Program STDOUT Box - Classic Cyber Green Theme */}
+                    <div
+                      style={{
+                        flex: 1,
+                        background: "#030603",
+                        border: "1.5px solid rgba(34, 197, 94, 0.35)",
+                        borderRadius: "6px",
+                        padding: "14px 16px",
+                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.1)",
+                      }}
+                    >
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "space-between",
-                          padding: "8px 12px",
-                          background: "rgba(239, 68, 68, 0.15)",
-                          border: "1px solid #ef4444",
-                          borderRadius: "6px",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#f87171", fontWeight: 800, fontSize: "12px" }}>
-                          <AlertTriangle size={15} />
-                          <span>BUILD FAILED • PROCESS TERMINATED (EXIT CODE {outputResult.exitCode})</span>
-                        </div>
-                        <span style={{ fontSize: "11px", color: "#94a3b8" }}>{outputResult.compileTime}</span>
-                      </div>
-
-                      {/* Error Card */}
-                      <div
-                        style={{
-                          background: "rgba(15, 23, 42, 0.7)",
-                          border: "1.5px solid rgba(239, 68, 68, 0.4)",
-                          borderRadius: "6px",
-                          padding: "14px",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 10,
-                        }}
-                      >
-                        <div style={{ color: "#ef4444", fontWeight: 900, fontSize: "13.5px", letterSpacing: "0.02em" }}>
-                          ❌ {outputResult.errorObj?.title || "Compilation Error"}
-                        </div>
-
-                        {outputResult.errorObj?.sourceLine && (
-                          <div
-                            style={{
-                              background: "#070b08",
-                              padding: "10px 12px",
-                              borderRadius: "4px",
-                              border: "1px solid rgba(239, 68, 68, 0.25)",
-                              fontFamily: "'JetBrains Mono', monospace",
-                              fontSize: "12px",
-                              lineHeight: "1.6",
-                              color: "#fca5a5",
-                              whiteSpace: "pre",
-                              overflowX: "auto",
-                            }}
-                          >
-                            <div style={{ color: "#64748b" }}>
-                              {`--> ${selectedLang.toUpperCase()}_SOURCE : Line ${outputResult.errorObj?.line || 1}`}
-                            </div>
-                            <div>
-                              <span style={{ color: "#ef4444", fontWeight: 700 }}>
-                                {outputResult.errorObj?.line || 1} |{" "}
-                              </span>
-                              {outputResult.errorObj?.sourceLine}
-                            </div>
-                            {outputResult.errorObj?.pointer && (
-                              <div style={{ color: "#f87171" }}>
-                                {"    | "}
-                                {outputResult.errorObj?.pointer}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Simple Human-Friendly Explanation */}
-                        {outputResult.errorObj?.explanation && (
-                          <div
-                            style={{
-                              background: "rgba(234, 179, 8, 0.12)",
-                              border: "1px solid rgba(234, 179, 8, 0.4)",
-                              borderRadius: "5px",
-                              padding: "10px 12px",
-                              color: "#fef08a",
-                              fontSize: "12px",
-                              lineHeight: "1.5",
-                            }}
-                          >
-                            <span style={{ fontWeight: 800, color: "#facc15" }}>💡 Simple Explanation: </span>
-                            {outputResult.errorObj.explanation}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    /* Case 3: SUCCESS - Clean Program Output (STDOUT) */
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
-                      {/* Success Summary Ribbon */}
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "8px 12px",
-                          background: "rgba(34, 197, 94, 0.12)",
-                          border: "1px solid rgba(34, 197, 94, 0.4)",
-                          borderRadius: "6px",
+                          marginBottom: "10px",
+                          paddingBottom: "6px",
+                          borderBottom: "1px solid rgba(34, 197, 94, 0.2)",
                           flexShrink: 0,
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#4ade80", fontWeight: 800, fontSize: "12px" }}>
-                          <CheckCircle2 size={15} />
-                          <span>PROGRAM FINISHED SUCCESSFULLY • EXIT CODE 0</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "11px" }}>
-                          <span style={{ color: "#38bdf8", fontWeight: 700 }}>{outputResult.compileTime}</span>
-                          <span style={{ color: "#64748b" }}>•</span>
-                          <span style={{ color: "#94a3b8" }}>{outputResult.memory}</span>
-                        </div>
+                        <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: 800, letterSpacing: "0.08em" }}>
+                          STANDARD OUTPUT (STDOUT)
+                        </span>
+                        <span style={{ fontSize: "10.5px", color: "#39ff14", fontWeight: 700, textShadow: "0 0 6px #39ff14" }}>
+                          ● {isDecrypting ? "DECRYPTING..." : "LIVE"}
+                        </span>
                       </div>
 
-                      {/* Clear Monospace Program STDOUT Box - Classic Cyber Green Theme */}
-                      <div
-                        style={{
-                          flex: 1,
-                          background: "#030603",
-                          border: "1.5px solid rgba(34, 197, 94, 0.35)",
-                          borderRadius: "6px",
-                          padding: "14px 16px",
-                          overflowY: "auto",
-                          display: "flex",
-                          flexDirection: "column",
-                          boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.1)",
-                        }}
-                      >
-                        <div
+                      {outputResult.stdout && outputResult.stdout.trim().length > 0 ? (
+                        <pre
                           style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            marginBottom: "10px",
-                            paddingBottom: "6px",
-                            borderBottom: "1px solid rgba(34, 197, 94, 0.2)",
-                            flexShrink: 0,
+                            margin: 0,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: "13px",
+                            lineHeight: "1.65",
+                            color: "#39ff14",
+                            textShadow: "0 0 8px rgba(57, 255, 20, 0.45)",
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-all",
+                            flex: 1,
                           }}
                         >
-                          <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: 800, letterSpacing: "0.08em" }}>
-                            STANDARD OUTPUT (STDOUT)
-                          </span>
-                          <span style={{ fontSize: "10.5px", color: "#39ff14", fontWeight: 700, textShadow: "0 0 6px #39ff14" }}>
-                            ● {isDecrypting ? "DECRYPTING..." : "LIVE"}
+                          {isDecrypting ? decryptedText : outputResult.stdout}
+                        </pre>
+                      ) : (
+                        <div
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: "12px",
+                            lineHeight: "1.6",
+                            color: "#64748b",
+                            fontStyle: "italic",
+                            padding: "10px 0",
+                          }}
+                        >
+                          [Process finished with exit code 0. No stdout produced.]
+                          <br />
+                          <span style={{ fontStyle: "normal", color: "#94a3b8", fontSize: "11.5px" }}>
+                            💡 Tip: Add a <code style={{ color: "#39ff14" }}>print()</code> or <code style={{ color: "#39ff14" }}>println!()</code> statement to output text here.
                           </span>
                         </div>
-
-                        {outputResult.stdout && outputResult.stdout.trim().length > 0 ? (
-                          <pre
-                            style={{
-                              margin: 0,
-                              fontFamily: "'JetBrains Mono', monospace",
-                              fontSize: "13px",
-                              lineHeight: "1.65",
-                              color: "#39ff14",
-                              textShadow: "0 0 8px rgba(57, 255, 20, 0.45)",
-                              whiteSpace: "pre-wrap",
-                              wordBreak: "break-all",
-                              flex: 1,
-                            }}
-                          >
-                            {isDecrypting ? decryptedText : outputResult.stdout}
-                          </pre>
-                        ) : (
-                          <div
-                            style={{
-                              fontFamily: "'JetBrains Mono', monospace",
-                              fontSize: "12px",
-                              lineHeight: "1.6",
-                              color: "#64748b",
-                              fontStyle: "italic",
-                              padding: "10px 0",
-                            }}
-                          >
-                            [Process finished with exit code 0. No stdout produced.]
-                            <br />
-                            <span style={{ fontStyle: "normal", color: "#94a3b8", fontSize: "11.5px" }}>
-                              💡 Tip: Add a <code style={{ color: "#39ff14" }}>print()</code> or <code style={{ color: "#39ff14" }}>println!()</code> statement to output text here.
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Output Telemetry Footer */}
             <div
@@ -2148,7 +2284,11 @@ export default function Page_HomeScreen({
               }}
             >
               <span>Target: WebAssembly WASI / x86_64</span>
-              <span>Memory: {outputResult.hasRun ? outputResult.memory : stats.memory}</span>
+              <span>
+                {activeRightTab === "complexity"
+                  ? `Algo: ${complexityAnalysis.algorithm.name} | Space: ${complexityAnalysis.spaceComplexity.bigO}`
+                  : `Memory: ${outputResult.hasRun ? outputResult.memory : stats.memory}`}
+              </span>
             </div>
           </div>
         )}
