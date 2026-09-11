@@ -479,7 +479,17 @@ export default function Page_HomeScreen({
   const decryptIntervalRef = useRef(null);
 
   const currentLangObj = LANGUAGES.find((l) => l.id === selectedLang) || LANGUAGES[0];
+  const selectedLangConfig = {
+    ...currentLangObj,
+    file: `main.${currentLangObj.ext}`,
+  };
   const currentCode = userCodes[selectedLang] || "";
+
+  const handleResetCode = () => {
+    sfx.playClick();
+    handleCodeChange(currentLangObj.def || "");
+    if (textareaRef.current) textareaRef.current.focus();
+  };
 
   // Static & Algorithmic Complexity Analysis (TASK-02)
   const complexityAnalysis = useMemo(() => {
