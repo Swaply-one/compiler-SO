@@ -19,13 +19,14 @@ import {
 } from "lucide-react";
 
 /**
- * ComplexityPanel Component (TASK-02)
+ * ComplexityPanel Component (TASK-02 & TASK-04)
  *
  * Dedicated panel for viewing:
  * 1. Space Complexity (Auxiliary memory, stack depth, heap usage)
  * 2. Time Complexity (Big-O asymptotic notation, best/average/worst case, operations estimate)
  * 3. Algorithm Used & Paradigms (Dynamic Programming, Greedy, Divide & Conquer, Sieve, etc.)
  * 4. Optimization Suggestions ("Use this code to get better complexity") with 1-click application
+ * 5. Supports both Studio White (Free) and Cyber Matrix (Premium) theme modes.
  */
 export default function ComplexityPanel({
   analysis,
@@ -33,12 +34,14 @@ export default function ComplexityPanel({
   onApplyCode,
   onReAnalyze,
   isAnalyzing = false,
+  themeMode = "matrix",
 }) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [appliedNotice, setAppliedNotice] = useState(false);
 
   if (!analysis) return null;
 
+  const isWhite = themeMode === "white";
   const { timeComplexity, spaceComplexity, algorithm, suggestion } = analysis;
 
   const handleCopyCode = (codeText) => {
@@ -79,8 +82,8 @@ export default function ComplexityPanel({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: "#030603",
-        color: "#f8fafc",
+        background: isWhite ? "#ffffff" : "#030603",
+        color: isWhite ? "#0f172a" : "#f8fafc",
         overflowY: "auto",
         padding: "14px 16px",
         boxSizing: "border-box",
@@ -88,207 +91,258 @@ export default function ComplexityPanel({
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       }}
     >
-      {/* Toast Notification when Suggested Code is Applied */}
-      {appliedNotice && (
-        <div
-          style={{
-            padding: "8px 14px",
-            borderRadius: "6px",
-            background: "linear-gradient(90deg, rgba(34, 197, 94, 0.25) 0%, rgba(56, 189, 248, 0.25) 100%)",
-            border: "1px solid #22c55e",
-            color: "#39ff14",
-            fontSize: "12px",
-            fontWeight: 800,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            boxShadow: "0 0 15px rgba(34, 197, 94, 0.35)",
-            animation: "fadeIn 0.2s ease",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Sparkles size={14} style={{ color: "#38bdf8" }} />
-            <span>⚡ Optimized code successfully applied to your editor!</span>
-          </div>
-          <span style={{ fontSize: "11px", color: "#86efac" }}>Ready to compile (Ctrl+↵)</span>
-        </div>
-      )}
-
-      {/* 1. TOP METRIC TILES: TIME, SPACE & ALGORITHM */}
+      {/* ------------------------------------------------------------- */}
+      {/* 1. TOP HEADER BANNER & RE-ANALYZE ACTION */}
+      {/* ------------------------------------------------------------- */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 10,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "10px 14px",
+          borderRadius: "8px",
+          background: isWhite ? "#f8fafc" : "rgba(56, 189, 248, 0.08)",
+          border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(56, 189, 248, 0.3)",
+          boxShadow: isWhite ? "0 1px 3px rgba(0,0,0,0.04)" : "none",
+          flexShrink: 0,
         }}
       >
-        {/* Card A: Time Complexity */}
-        <div
-          style={{
-            background: "rgba(10, 20, 14, 0.95)",
-            border: `1.5px solid ${timeComplexity.color || "rgba(34, 197, 94, 0.4)"}`,
-            borderRadius: "8px",
-            padding: "12px 14px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            boxShadow: `0 4px 16px rgba(0, 0, 0, 0.5), 0 0 10px ${timeComplexity.color}22`,
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94a3b8", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              <Clock size={13} style={{ color: timeComplexity.color }} />
-              <span>Time Complexity</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          <div
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "6px",
+              background: isWhite ? "#eff6ff" : "rgba(56, 189, 248, 0.2)",
+              border: isWhite ? "1px solid #bfdbfe" : "1px solid #38bdf8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: isWhite ? "#2563eb" : "#38bdf8",
+            }}
+          >
+            <Cpu size={16} />
+          </div>
+          <div>
+            <div style={{ fontSize: "12.5px", fontWeight: 800, color: isWhite ? "#0f172a" : "#f8fafc" }}>
+              Algorithmic Engine Analysis
             </div>
-            <span
-              style={{
-                fontSize: "9.5px",
-                fontWeight: 900,
-                padding: "1px 6px",
-                borderRadius: "3px",
-                background: `${timeComplexity.color}25`,
-                border: `1px solid ${timeComplexity.color}`,
-                color: timeComplexity.color,
-                letterSpacing: "0.04em",
-              }}
-            >
-              {timeComplexity.badge}
-            </span>
-          </div>
-
-          <div style={{ fontSize: "22px", fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", color: timeComplexity.color, textShadow: `0 0 10px ${timeComplexity.color}44` }}>
-            {timeComplexity.bigO}
-          </div>
-
-          <div style={{ fontSize: "11.5px", color: "#cbd5e1", display: "flex", flexDirection: "column", gap: 2 }}>
-            <span style={{ fontWeight: 600 }}>{timeComplexity.label}</span>
-            <span style={{ fontSize: "10.5px", color: "#64748b" }}>{timeComplexity.opsEstimate}</span>
+            <div style={{ fontSize: "11px", color: isWhite ? "#64748b" : "#94a3b8" }}>
+              Real-time asymptotic notation & optimization advisor
+            </div>
           </div>
         </div>
 
-        {/* Card B: Space Complexity */}
+        <button
+          onClick={onReAnalyze}
+          disabled={isAnalyzing}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 5,
+            padding: "5px 11px",
+            borderRadius: "5px",
+            background: isWhite ? "#ffffff" : "rgba(56, 189, 248, 0.15)",
+            border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(56, 189, 248, 0.4)",
+            color: isWhite ? "#2563eb" : "#38bdf8",
+            fontSize: "11px",
+            fontWeight: 700,
+            cursor: isAnalyzing ? "not-allowed" : "pointer",
+            transition: "all 0.15s ease",
+          }}
+          title="Re-run static algorithm analyzer"
+        >
+          <RefreshCw size={12} className={isAnalyzing ? "animate-spin" : ""} />
+          <span>{isAnalyzing ? "Analyzing..." : "Re-Analyze"}</span>
+        </button>
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 2. TIME & SPACE COMPLEXITY METRIC CARDS (SIDE-BY-SIDE) */}
+      {/* ------------------------------------------------------------- */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, flexShrink: 0 }}>
+        {/* TIME COMPLEXITY CARD */}
         <div
           style={{
-            background: "rgba(10, 20, 14, 0.95)",
-            border: `1.5px solid ${spaceComplexity.color || "rgba(34, 197, 94, 0.4)"}`,
+            background: isWhite ? "#f8fafc" : "#060c07",
+            border: isWhite ? "1px solid #e2e8f0" : `1.5px solid ${timeComplexity.color || "#22c55e"}55`,
             borderRadius: "8px",
             padding: "12px 14px",
             display: "flex",
             flexDirection: "column",
-            gap: 6,
-            boxShadow: `0 4px 16px rgba(0, 0, 0, 0.5), 0 0 10px ${spaceComplexity.color}22`,
-            position: "relative",
-            overflow: "hidden",
+            gap: 8,
+            boxShadow: isWhite ? "0 1px 3px rgba(0,0,0,0.03)" : `0 4px 20px ${timeComplexity.color || "#22c55e"}15`,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94a3b8", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              <HardDrive size={13} style={{ color: spaceComplexity.color }} />
-              <span>Space Complexity</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Clock size={15} color={timeComplexity.color || (isWhite ? "#16a34a" : "#22c55e")} />
+              <span style={{ fontSize: "11.5px", fontWeight: 700, color: isWhite ? "#475569" : "#94a3b8", textTransform: "uppercase" }}>
+                Time Complexity
+              </span>
             </div>
             <span
               style={{
-                fontSize: "9.5px",
-                fontWeight: 900,
-                padding: "1px 6px",
-                borderRadius: "3px",
-                background: `${spaceComplexity.color}25`,
-                border: `1px solid ${spaceComplexity.color}`,
-                color: spaceComplexity.color,
-                letterSpacing: "0.04em",
+                fontSize: "10px",
+                fontWeight: 800,
+                padding: "2px 7px",
+                borderRadius: "4px",
+                background: `${timeComplexity.color || "#22c55e"}22`,
+                color: timeComplexity.color || (isWhite ? "#16a34a" : "#22c55e"),
+                border: `1px solid ${timeComplexity.color || "#22c55e"}44`,
               }}
             >
-              {spaceComplexity.badge}
+              {timeComplexity.rating}
             </span>
           </div>
 
-          <div style={{ fontSize: "22px", fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", color: spaceComplexity.color, textShadow: `0 0 10px ${spaceComplexity.color}44` }}>
-            {spaceComplexity.bigO}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: "24px",
+                fontWeight: 900,
+                color: isWhite ? (timeComplexity.color === "#39ff14" || timeComplexity.color === "#22c55e" ? "#16a34a" : timeComplexity.color || "#16a34a") : (timeComplexity.color || "#39ff14"),
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {timeComplexity.bigO}
+            </div>
           </div>
 
-          <div style={{ fontSize: "11.5px", color: "#cbd5e1", display: "flex", flexDirection: "column", gap: 2 }}>
-            <span style={{ fontWeight: 600 }}>{spaceComplexity.label}</span>
-            <span style={{ fontSize: "10.5px", color: "#64748b" }}>{spaceComplexity.auxiliarySpace}</span>
+          <div style={{ fontSize: "11px", color: isWhite ? "#475569" : "#cbd5e1", lineHeight: "1.45" }}>
+            {timeComplexity.explanation}
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 4,
+              paddingTop: "6px",
+              borderTop: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.08)",
+              fontSize: "10.5px",
+              color: isWhite ? "#64748b" : "#94a3b8",
+            }}
+          >
+            <div>
+              Best: <strong style={{ color: isWhite ? "#0f172a" : "#f8fafc", fontFamily: "'JetBrains Mono', monospace" }}>{timeComplexity.bestCase}</strong>
+            </div>
+            <div>
+              Worst: <strong style={{ color: isWhite ? "#0f172a" : "#f8fafc", fontFamily: "'JetBrains Mono', monospace" }}>{timeComplexity.worstCase}</strong>
+            </div>
           </div>
         </div>
 
-        {/* Card C: Algorithm Used & Paradigm */}
+        {/* SPACE COMPLEXITY CARD */}
         <div
           style={{
-            background: "rgba(10, 20, 14, 0.95)",
-            border: "1.5px solid rgba(56, 189, 248, 0.4)",
+            background: isWhite ? "#f8fafc" : "#060c07",
+            border: isWhite ? "1px solid #e2e8f0" : `1.5px solid ${spaceComplexity.color || "#38bdf8"}55`,
             borderRadius: "8px",
             padding: "12px 14px",
             display: "flex",
             flexDirection: "column",
-            gap: 6,
-            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.5), 0 0 10px rgba(56, 189, 248, 0.15)",
+            gap: 8,
+            boxShadow: isWhite ? "0 1px 3px rgba(0,0,0,0.03)" : `0 4px 20px ${spaceComplexity.color || "#38bdf8"}15`,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#94a3b8", fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              <Cpu size={13} style={{ color: "#38bdf8" }} />
-              <span>Algorithm Used</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <HardDrive size={15} color={spaceComplexity.color || (isWhite ? "#0284c7" : "#38bdf8")} />
+              <span style={{ fontSize: "11.5px", fontWeight: 700, color: isWhite ? "#475569" : "#94a3b8", textTransform: "uppercase" }}>
+                Space Complexity
+              </span>
             </div>
             <span
               style={{
-                fontSize: "9.5px",
-                fontWeight: 900,
-                padding: "1px 6px",
-                borderRadius: "3px",
-                background: "rgba(56, 189, 248, 0.15)",
-                border: "1px solid #38bdf8",
-                color: "#38bdf8",
+                fontSize: "10px",
+                fontWeight: 800,
+                padding: "2px 7px",
+                borderRadius: "4px",
+                background: `${spaceComplexity.color || "#38bdf8"}22`,
+                color: spaceComplexity.color || (isWhite ? "#0284c7" : "#38bdf8"),
+                border: `1px solid ${spaceComplexity.color || "#38bdf8"}44`,
               }}
             >
-              {algorithm.paradigm}
+              {spaceComplexity.rating}
             </span>
           </div>
 
-          <div style={{ fontSize: "15px", fontWeight: 800, color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {algorithm.name}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+            <div
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: "24px",
+                fontWeight: 900,
+                color: isWhite ? (spaceComplexity.color === "#38bdf8" ? "#0284c7" : spaceComplexity.color || "#0284c7") : (spaceComplexity.color || "#38bdf8"),
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {spaceComplexity.bigO}
+            </div>
           </div>
 
-          <div style={{ fontSize: "11px", color: "#94a3b8", lineHeight: "1.4" }}>
-            {algorithm.summary}
+          <div style={{ fontSize: "11px", color: isWhite ? "#475569" : "#cbd5e1", lineHeight: "1.45" }}>
+            {spaceComplexity.explanation}
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 4,
+              paddingTop: "6px",
+              borderTop: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.08)",
+              fontSize: "10.5px",
+              color: isWhite ? "#64748b" : "#94a3b8",
+            }}
+          >
+            <div>
+              Stack: <strong style={{ color: isWhite ? "#0f172a" : "#f8fafc", fontFamily: "'JetBrains Mono', monospace" }}>{spaceComplexity.stackDepth}</strong>
+            </div>
+            <div>
+              Heap: <strong style={{ color: isWhite ? "#0f172a" : "#f8fafc", fontFamily: "'JetBrains Mono', monospace" }}>{spaceComplexity.heapAllocations}</strong>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. VISUAL COMPLEXITY SPECTRUM GAUGE */}
+      {/* ------------------------------------------------------------- */}
+      {/* 3. ASYMPTOTIC SCALE GAUGE METER */}
+      {/* ------------------------------------------------------------- */}
       <div
         style={{
-          background: "rgba(6, 12, 8, 0.8)",
-          border: "1px solid rgba(34, 197, 94, 0.2)",
+          background: isWhite ? "#f8fafc" : "#060c07",
+          border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.08)",
           borderRadius: "8px",
-          padding: "10px 14px",
+          padding: "12px 14px",
           display: "flex",
           flexDirection: "column",
-          gap: 6,
+          gap: 8,
+          flexShrink: 0,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "11px" }}>
-          <span style={{ color: "#94a3b8", fontWeight: 700, letterSpacing: "0.04em" }}>
-            COMPLEXITY SPECTRUM SCALE
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
+          <span style={{ fontWeight: 700, color: isWhite ? "#475569" : "#94a3b8" }}>
+            Asymptotic Growth Spectrum
           </span>
-          <span style={{ color: timeComplexity.color, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>
-            Current: {timeComplexity.bigO}
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", color: timeComplexity.color || (isWhite ? "#16a34a" : "#39ff14"), fontWeight: 700 }}>
+            {timeComplexity.bigO} ({scalePercent}% scale)
           </span>
         </div>
 
-        {/* Gradient spectrum bar */}
+        {/* Multi-tier Gradient Bar */}
         <div
           style={{
             height: "8px",
             width: "100%",
             borderRadius: "4px",
-            background: "linear-gradient(90deg, #22c55e 0%, #38bdf8 30%, #facc15 65%, #f97316 82%, #ef4444 100%)",
+            background: "linear-gradient(to right, #22c55e 0%, #38bdf8 30%, #eab308 65%, #ef4444 100%)",
             position: "relative",
           }}
         >
-          {/* Position Needle Marker */}
+          {/* Position Pin Pointer */}
           <div
             style={{
               position: "absolute",
@@ -298,308 +352,238 @@ export default function ComplexityPanel({
               width: "16px",
               height: "16px",
               borderRadius: "50%",
-              backgroundColor: "#ffffff",
-              border: `3px solid ${timeComplexity.color}`,
-              boxShadow: `0 0 10px ${timeComplexity.color}`,
-              transition: "left 0.3s ease",
+              background: "#ffffff",
+              border: `3px solid ${timeComplexity.color || "#22c55e"}`,
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+              transition: "left 0.4s ease",
             }}
           />
         </div>
 
-        {/* Big-O milestones */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             fontSize: "9.5px",
-            color: "#64748b",
+            color: isWhite ? "#94a3b8" : "#64748b",
             fontFamily: "'JetBrains Mono', monospace",
-            paddingTop: "2px",
           }}
         >
-          <span style={{ color: "#22c55e" }}>O(1)</span>
-          <span style={{ color: "#38bdf8" }}>O(log N)</span>
-          <span style={{ color: "#4ade80" }}>O(N)</span>
-          <span style={{ color: "#facc15" }}>O(N log N)</span>
-          <span style={{ color: "#f97316" }}>O(N²)</span>
-          <span style={{ color: "#ef4444" }}>O(2^N) / O(N!)</span>
+          <span>O(1) Constant</span>
+          <span>O(log N)</span>
+          <span>O(N) Linear</span>
+          <span>O(N log N)</span>
+          <span>O(N²) Quad</span>
+          <span>O(2^N) Exp</span>
         </div>
       </div>
 
-      {/* 3. BOTTLENECKS SECTION (IF ANY) */}
-      {algorithm.bottlenecks && algorithm.bottlenecks.length > 0 && (
-        <div
-          style={{
-            background: "rgba(239, 68, 68, 0.08)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            borderRadius: "8px",
-            padding: "10px 14px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#f87171", fontSize: "11.5px", fontWeight: 800 }}>
-            <AlertTriangle size={13} />
-            <span>DETECTED COMPLEXITY BOTTLENECKS</span>
+      {/* ------------------------------------------------------------- */}
+      {/* 4. ALGORITHM USED & DETECTED PATTERNS */}
+      {/* ------------------------------------------------------------- */}
+      <div
+        style={{
+          background: isWhite ? "#f8fafc" : "#060c07",
+          border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(168, 85, 247, 0.3)",
+          borderRadius: "8px",
+          padding: "12px 14px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Layers size={15} color={isWhite ? "#7c3aed" : "#c084fc"} />
+            <span style={{ fontSize: "11.5px", fontWeight: 700, color: isWhite ? "#475569" : "#94a3b8", textTransform: "uppercase" }}>
+              Detected Algorithm
+            </span>
           </div>
-          {algorithm.bottlenecks.map((b, idx) => (
-            <div key={idx} style={{ fontSize: "11.5px", color: "#cbd5e1", lineHeight: "1.4" }}>
-              <span style={{ color: "#fca5a5", fontWeight: 700 }}>• {b.title}: </span>
-              {b.desc}
-            </div>
-          ))}
+          <span
+            style={{
+              fontSize: "10.5px",
+              fontWeight: 800,
+              padding: "2px 8px",
+              borderRadius: "4px",
+              background: isWhite ? "#f3e8ff" : "rgba(168, 85, 247, 0.15)",
+              color: isWhite ? "#7c3aed" : "#c084fc",
+              border: isWhite ? "1px solid #d8b4fe" : "1px solid rgba(168, 85, 247, 0.4)",
+            }}
+          >
+            {algorithm.paradigm}
+          </span>
         </div>
-      )}
 
-      {/* 4. "USE THIS CODE TO GET BETTER COMPLEXITY" OPTIMIZATION SECTION */}
-      {suggestion ? (
+        <div style={{ fontSize: "14px", fontWeight: 800, color: isWhite ? "#0f172a" : "#f8fafc" }}>
+          {algorithm.name}
+        </div>
+
+        <div style={{ fontSize: "11.5px", color: isWhite ? "#475569" : "#cbd5e1", lineHeight: "1.5" }}>
+          {algorithm.description}
+        </div>
+
+        {algorithm.identifiedPatterns && algorithm.identifiedPatterns.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: "4px" }}>
+            {algorithm.identifiedPatterns.map((pat, idx) => (
+              <span
+                key={idx}
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  background: isWhite ? "#f1f5f9" : "rgba(255, 255, 255, 0.06)",
+                  border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.12)",
+                  color: isWhite ? "#334155" : "#e2e8f0",
+                  padding: "2px 7px",
+                  borderRadius: "4px",
+                }}
+              >
+                #{pat}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 5. CODE OPTIMIZATION SUGGESTION (DYNAMIC 1-CLICK APPLY) */}
+      {/* ------------------------------------------------------------- */}
+      {suggestion && (
         <div
           style={{
-            background: "rgba(10, 22, 16, 0.98)",
-            border: "1.5px solid rgba(34, 197, 94, 0.5)",
+            background: isWhite ? "#eff6ff" : "rgba(14, 165, 233, 0.08)",
+            border: isWhite ? "1.5px solid #93c5fd" : "1.5px solid rgba(14, 165, 233, 0.45)",
             borderRadius: "8px",
             padding: "14px",
             display: "flex",
             flexDirection: "column",
-            gap: 12,
-            boxShadow: "0 6px 24px rgba(0, 0, 0, 0.7), 0 0 15px rgba(34, 197, 94, 0.15)",
+            gap: 10,
+            flexShrink: 0,
+            boxShadow: isWhite ? "0 4px 12px rgba(37, 99, 235, 0.06)" : "0 4px 20px rgba(14, 165, 233, 0.15)",
           }}
         >
-          {/* Suggestion Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div
-                style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "6px",
-                  background: "linear-gradient(135deg, #15803d 0%, #22c55e 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#030603",
-                  boxShadow: "0 0 10px rgba(34, 197, 94, 0.5)",
-                }}
-              >
-                <Zap size={16} fill="currentColor" />
-              </div>
-              <div>
-                <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#ffffff" }}>
-                  {suggestion.title}
-                </div>
-                <div style={{ fontSize: "11.5px", color: "#86efac", fontWeight: 600 }}>
-                  💡 {suggestion.benefit}
-                </div>
-              </div>
-            </div>
-
-            {/* Speedup Badge */}
-            {suggestion.speedup && (
-              <span
-                style={{
-                  padding: "3px 8px",
-                  borderRadius: "4px",
-                  background: "rgba(34, 197, 94, 0.2)",
-                  border: "1px solid #22c55e",
-                  color: "#39ff14",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  letterSpacing: "0.04em",
-                }}
-              >
-                ⚡ {suggestion.speedup}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              <Sparkles size={16} color={isWhite ? "#2563eb" : "#38bdf8"} />
+              <span style={{ fontSize: "12.5px", fontWeight: 800, color: isWhite ? "#1e40af" : "#38bdf8" }}>
+                Optimization Recommendation
               </span>
-            )}
-          </div>
-
-          {/* Complexity Comparison Matrix */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr",
-              alignItems: "center",
-              gap: 8,
-              background: "#030603",
-              border: "1px solid rgba(34, 197, 94, 0.25)",
-              borderRadius: "6px",
-              padding: "10px 14px",
-            }}
-          >
-            {/* Current Metrics */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase" }}>Current Code</span>
-              <div style={{ fontSize: "13px", fontWeight: 800, color: "#f87171", fontFamily: "'JetBrains Mono', monospace" }}>
-                Time: {suggestion.currentTime}
-              </div>
-              <div style={{ fontSize: "11px", color: "#cbd5e1" }}>
-                Space: {suggestion.currentSpace}
-              </div>
             </div>
-
-            {/* Arrow Divider */}
             <div
               style={{
+                fontSize: "10.5px",
+                fontWeight: 800,
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: isWhite ? "#dcfce7" : "rgba(34, 197, 94, 0.2)",
+                color: isWhite ? "#15803d" : "#4ade80",
+                border: isWhite ? "1px solid #86efac" : "1px solid rgba(34, 197, 94, 0.5)",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                width: "28px",
-                height: "28px",
-                borderRadius: "50%",
-                background: "rgba(34, 197, 94, 0.2)",
-                color: "#39ff14",
+                gap: 4,
               }}
             >
-              <ArrowRight size={14} />
-            </div>
-
-            {/* Improved Metrics */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 3, textAlign: "right" }}>
-              <span style={{ fontSize: "10px", color: "#86efac", fontWeight: 700, textTransform: "uppercase" }}>Optimized Target</span>
-              <div style={{ fontSize: "13px", fontWeight: 800, color: "#39ff14", fontFamily: "'JetBrains Mono', monospace" }}>
-                Time: {suggestion.improvedTime}
-              </div>
-              <div style={{ fontSize: "11px", color: "#86efac" }}>
-                Space: {suggestion.improvedSpace}
-              </div>
+              <TrendingUp size={11} />
+              <span>{suggestion.improvement}</span>
             </div>
           </div>
 
-          {/* Code Preview Box */}
-          {suggestion.code && (
+          <div style={{ fontSize: "13px", fontWeight: 700, color: isWhite ? "#0f172a" : "#f8fafc" }}>
+            {suggestion.title}
+          </div>
+
+          <div style={{ fontSize: "11.5px", color: isWhite ? "#334155" : "#cbd5e1", lineHeight: "1.5" }}>
+            {suggestion.description}
+          </div>
+
+          {/* Optimized Code Snippet Box */}
+          {suggestion.suggestedCode && (
             <div
               style={{
-                display: "flex",
-                flexDirection: "column",
                 borderRadius: "6px",
                 overflow: "hidden",
-                border: "1.5px solid rgba(34, 197, 94, 0.35)",
-                background: "#020502",
+                border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+                background: isWhite ? "#ffffff" : "#020402",
               }}
             >
-              {/* Code Box Header with Actions */}
               <div
                 style={{
-                  height: "36px",
-                  padding: "0 12px",
-                  background: "rgba(10, 20, 12, 0.98)",
-                  borderBottom: "1px solid rgba(34, 197, 94, 0.25)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  padding: "6px 10px",
+                  background: isWhite ? "#f1f5f9" : "rgba(255, 255, 255, 0.05)",
+                  borderBottom: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.1)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "11px", color: "#86efac", fontWeight: 700 }}>
-                  <Code2 size={13} style={{ color: "#39ff14" }} />
-                  <span>SUGGESTED OPTIMIZATION ({selectedLang.toUpperCase()})</span>
-                </div>
+                <span style={{ fontSize: "10.5px", fontWeight: 700, color: isWhite ? "#64748b" : "#94a3b8", fontFamily: "'JetBrains Mono', monospace" }}>
+                  💡 Optimized {selectedLang.toUpperCase()} Implementation
+                </span>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {/* Copy Button */}
                   <button
-                    onClick={() => handleCopyCode(suggestion.code)}
+                    onClick={() => handleCopyCode(suggestion.suggestedCode)}
                     style={{
-                      padding: "3px 8px",
-                      borderRadius: "4px",
-                      background: copiedCode ? "rgba(34, 197, 94, 0.25)" : "transparent",
-                      border: "1px solid rgba(255, 255, 255, 0.15)",
-                      color: copiedCode ? "#39ff14" : "#94a3b8",
-                      fontSize: "10.5px",
-                      cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
                       gap: 4,
-                      transition: "all 0.15s ease",
+                      padding: "3px 8px",
+                      borderRadius: "4px",
+                      background: "transparent",
+                      border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.2)",
+                      color: isWhite ? "#475569" : "#e2e8f0",
+                      fontSize: "10.5px",
+                      cursor: "pointer",
                     }}
-                    title="Copy optimized code snippet"
+                    title="Copy suggested code"
                   >
-                    {copiedCode ? <Check size={11} /> : <Copy size={11} />}
+                    {copiedCode ? <Check size={11} color="#22c55e" /> : <Copy size={11} />}
                     <span>{copiedCode ? "Copied" : "Copy"}</span>
                   </button>
 
-                  {/* USE THIS CODE (APPLY) ACTION BUTTON */}
                   <button
-                    onClick={() => handleApply(suggestion.code)}
+                    onClick={() => handleApply(suggestion.suggestedCode)}
                     style={{
-                      padding: "4px 12px",
-                      borderRadius: "4px",
-                      background: "linear-gradient(135deg, #15803d 0%, #22c55e 100%)",
-                      border: "1px solid #22c55e",
-                      color: "#030603",
-                      fontSize: "11px",
-                      fontWeight: 900,
-                      cursor: "pointer",
                       display: "flex",
                       alignItems: "center",
-                      gap: 5,
-                      boxShadow: "0 0 12px rgba(34, 197, 94, 0.5)",
-                      transition: "all 0.15s ease",
+                      gap: 4,
+                      padding: "3px 10px",
+                      borderRadius: "4px",
+                      background: isWhite ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)" : "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+                      border: isWhite ? "1px solid #2563eb" : "1px solid #38bdf8",
+                      color: "#ffffff",
+                      fontSize: "10.5px",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      boxShadow: isWhite ? "0 2px 6px rgba(37, 99, 235, 0.25)" : "0 0 10px rgba(56, 189, 248, 0.35)",
                     }}
-                    title="Replace editor code with this optimized implementation"
+                    title="Replace current editor code with optimized algorithm"
                   >
-                    <Sparkles size={12} fill="#030603" />
-                    <span>USE THIS CODE</span>
+                    {appliedNotice ? <CheckCircle2 size={12} /> : <ArrowRight size={12} />}
+                    <span>{appliedNotice ? "Applied to Editor!" : "Apply to Editor"}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Code Snippet */}
               <pre
                 style={{
                   margin: 0,
-                  padding: "12px 14px",
+                  padding: "10px 12px",
+                  fontSize: "11.5px",
                   fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: "12px",
-                  lineHeight: "1.6",
-                  color: "#39ff14",
+                  lineHeight: "1.55",
+                  color: isWhite ? "#0f172a" : "#86efac",
                   overflowX: "auto",
-                  maxHeight: "220px",
                   whiteSpace: "pre",
-                  background: "#020402",
+                  maxHeight: "180px",
+                  overflowY: "auto",
                 }}
               >
-                {suggestion.code}
+                {suggestion.suggestedCode}
               </pre>
             </div>
           )}
-        </div>
-      ) : (
-        /* Optimal State Card when no major bottleneck exists */
-        <div
-          style={{
-            background: "rgba(34, 197, 94, 0.08)",
-            border: "1.5px solid rgba(34, 197, 94, 0.35)",
-            borderRadius: "8px",
-            padding: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              background: "rgba(34, 197, 94, 0.2)",
-              border: "1px solid #22c55e",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#39ff14",
-              flexShrink: 0,
-            }}
-          >
-            <CheckCircle2 size={18} />
-          </div>
-          <div>
-            <div style={{ fontSize: "13px", fontWeight: 800, color: "#ffffff" }}>
-              High-Efficiency Algorithmic Implementation
-            </div>
-            <div style={{ fontSize: "11.5px", color: "#86efac", marginTop: "2px" }}>
-              This code is operating within optimal computational complexity bounds with low auxiliary memory overhead.
-            </div>
-          </div>
         </div>
       )}
     </div>

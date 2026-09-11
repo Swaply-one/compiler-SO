@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Terminal,
+  Sun,
+  Moon,
+  Crown,
+  Palette,
   Play,
   RotateCcw,
   Trash2,
@@ -417,6 +421,23 @@ export default function Page_HomeScreen({
   onNavigateOTP,
 }) {
   const [selectedLang, setSelectedLang] = useState("rust");
+  const [themeMode, setThemeMode] = useState(() => {
+    try {
+      return localStorage.getItem("swaply_compiler_theme_mode") || "white";
+    } catch {
+      return "white";
+    }
+  });
+
+  const handleSetThemeMode = (mode) => {
+    setThemeMode(mode);
+    sfx.playClick();
+    try {
+      localStorage.setItem("swaply_compiler_theme_mode", mode);
+    } catch {}
+  };
+
+  const isWhite = themeMode === "white";
   const [userCodes, setUserCodes] = useState(() => {
     const map = {};
     LANGUAGES.forEach((l) => (map[l.id] = l.def));
@@ -1203,13 +1224,14 @@ export default function Page_HomeScreen({
       style={{
         height: "100vh",
         width: "100vw",
-        backgroundColor: "#070b08",
-        color: "#f1f5f9",
+        backgroundColor: isWhite ? "#f8fafc" : "#070b08",
+        color: isWhite ? "#0f172a" : "#f1f5f9",
         fontFamily: "'JetBrains Mono', monospace",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         boxSizing: "border-box",
+        transition: "background-color 0.2s ease, color 0.2s ease",
       }}
     >
       {/* ===================================================================== */}
@@ -1223,11 +1245,13 @@ export default function Page_HomeScreen({
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: "rgba(9, 15, 10, 0.98)",
-          borderBottom: "1.5px solid rgba(34, 197, 94, 0.25)",
+          background: isWhite ? "rgba(255, 255, 255, 0.98)" : "rgba(9, 15, 10, 0.98)",
+          borderBottom: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.25)",
+          boxShadow: isWhite ? "0 2px 8px rgba(0, 0, 0, 0.04)" : "none",
           boxSizing: "border-box",
           flexShrink: 0,
           zIndex: 50,
+          transition: "all 0.2s ease",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -1241,9 +1265,9 @@ export default function Page_HomeScreen({
               style={{
                 appearance: "none",
                 WebkitAppearance: "none",
-                backgroundColor: "rgba(18, 32, 20, 0.95)",
-                color: "#39ff14",
-                border: "1.5px solid #22c55e",
+                backgroundColor: isWhite ? "#ffffff" : "rgba(18, 32, 20, 0.95)",
+                color: isWhite ? "#0f172a" : "#39ff14",
+                border: isWhite ? "1.5px solid #cbd5e1" : "1.5px solid #22c55e",
                 borderRadius: "6px",
                 padding: "5px 30px 5px 12px",
                 fontSize: "13px",
@@ -1251,14 +1275,14 @@ export default function Page_HomeScreen({
                 fontFamily: "'JetBrains Mono', monospace",
                 cursor: "pointer",
                 outline: "none",
-                boxShadow: "0 0 10px rgba(34, 197, 94, 0.25)",
+                boxShadow: isWhite ? "0 1px 3px rgba(0, 0, 0, 0.05)" : "0 0 10px rgba(34, 197, 94, 0.25)",
               }}
             >
               {LANGUAGES.map((l) => (
                 <option
                   key={l.id}
                   value={l.id}
-                  style={{ backgroundColor: "#0b150d", color: "#f8fafc", padding: "6px" }}
+                  style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#0f172a" : "#f8fafc", padding: "6px" }}
                 >
                   [{l.icon}] {l.name} ({l.tag})
                 </option>
@@ -1269,12 +1293,72 @@ export default function Page_HomeScreen({
               style={{
                 position: "absolute",
                 right: "9px",
-                color: "#39ff14",
+                color: isWhite ? "#475569" : "#39ff14",
                 pointerEvents: "none",
               }}
             />
           </div>
 
+          {/* MODE / THEME SWITCHER (MODES FORMAT: STUDIO WHITE VS MATRIX PRO) */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: isWhite ? "#f1f5f9" : "rgba(18, 32, 20, 0.9)",
+              border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(34, 197, 94, 0.35)",
+              borderRadius: "6px",
+              padding: "2px",
+              gap: "2px",
+            }}
+          >
+            {/* White / Studio Light Mode */}
+            <button
+              onClick={() => handleSetThemeMode("white")}
+              style={{
+                padding: "3px 9px",
+                borderRadius: "4px",
+                border: "none",
+                background: isWhite ? "#ffffff" : "transparent",
+                color: isWhite ? "#2563eb" : "#94a3b8",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                boxShadow: isWhite ? "0 1px 3px rgba(0, 0, 0, 0.1)" : "none",
+                transition: "all 0.15s ease",
+              }}
+              title="Standard Clean Studio White Theme (Free Tier)"
+            >
+              <Sun size={12} color={isWhite ? "#2563eb" : "#94a3b8"} />
+              <span>Studio Light</span>
+            </button>
+
+            {/* Matrix / Cyber Neon Mode */}
+            <button
+              onClick={() => handleSetThemeMode("matrix")}
+              style={{
+                padding: "3px 9px",
+                borderRadius: "4px",
+                border: "none",
+                background: !isWhite ? "rgba(34, 197, 94, 0.25)" : "transparent",
+                color: !isWhite ? "#39ff14" : "#64748b",
+                fontSize: "11px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                boxShadow: !isWhite ? "0 0 10px rgba(34, 197, 94, 0.3)" : "none",
+                transition: "all 0.15s ease",
+              }}
+              title="Cyber Matrix Theme (Premium Pro Tier)"
+            >
+              <Crown size={12} color={!isWhite ? "#facc15" : "#64748b"} />
+              <span>Matrix Pro</span>
+            </button>
+          </div>
         </div>
 
         {/* Route Navigation Shortcuts & Utilities */}
@@ -1291,13 +1375,13 @@ export default function Page_HomeScreen({
               borderRadius: "5px",
               background:
                 activeRightTab === "complexity" && isOutputOpen
-                  ? "rgba(56, 189, 248, 0.25)"
-                  : "rgba(56, 189, 248, 0.12)",
+                  ? (isWhite ? "#eff6ff" : "rgba(56, 189, 248, 0.25)")
+                  : (isWhite ? "#f8fafc" : "rgba(56, 189, 248, 0.12)"),
               border:
                 activeRightTab === "complexity" && isOutputOpen
-                  ? "1.5px solid #38bdf8"
-                  : "1px solid rgba(56, 189, 248, 0.4)",
-              color: "#38bdf8",
+                  ? (isWhite ? "1.5px solid #2563eb" : "1.5px solid #38bdf8")
+                  : (isWhite ? "1px solid #cbd5e1" : "1px solid rgba(56, 189, 248, 0.4)"),
+              color: isWhite ? "#2563eb" : "#38bdf8",
               fontSize: "11.5px",
               fontWeight: 800,
               cursor: "pointer",
@@ -1306,7 +1390,7 @@ export default function Page_HomeScreen({
               gap: 5,
               boxShadow:
                 activeRightTab === "complexity" && isOutputOpen
-                  ? "0 0 10px rgba(56, 189, 248, 0.35)"
+                  ? (isWhite ? "0 2px 6px rgba(37, 99, 235, 0.15)" : "0 0 10px rgba(56, 189, 248, 0.35)")
                   : "none",
             }}
             title="Open Dedicated Complexity & Algorithm Panel"
@@ -1325,9 +1409,9 @@ export default function Page_HomeScreen({
               style={{
                 padding: "4px 10px",
                 borderRadius: "5px",
-                background: "rgba(239, 68, 68, 0.18)",
-                border: "1.5px solid #ef4444",
-                color: "#fca5a5",
+                background: isWhite ? "#fef2f2" : "rgba(239, 68, 68, 0.18)",
+                border: isWhite ? "1.5px solid #f87171" : "1.5px solid #ef4444",
+                color: isWhite ? "#b91c1c" : "#fca5a5",
                 fontSize: "11.5px",
                 fontWeight: 800,
                 cursor: "pointer",
@@ -1349,16 +1433,16 @@ export default function Page_HomeScreen({
               style={{
                 padding: "4px 12px",
                 borderRadius: "5px",
-                background: "rgba(34, 197, 94, 0.25)",
-                border: "1.5px solid #22c55e",
-                color: "#39ff14",
+                background: isWhite ? "rgba(37, 99, 235, 0.1)" : "rgba(34, 197, 94, 0.25)",
+                border: isWhite ? "1.5px solid #2563eb" : "1.5px solid #22c55e",
+                color: isWhite ? "#2563eb" : "#39ff14",
                 fontSize: "11.5px",
                 fontWeight: 800,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                boxShadow: "0 0 10px rgba(34, 197, 94, 0.35)",
+                boxShadow: isWhite ? "0 2px 6px rgba(37, 99, 235, 0.2)" : "0 0 10px rgba(34, 197, 94, 0.35)",
               }}
               title="Open Output Window"
             >
@@ -1367,7 +1451,7 @@ export default function Page_HomeScreen({
             </button>
           )}
 
-          {/* Compact Page Switcher Dropdown (Completely eliminates button clutter & overlap) */}
+          {/* Compact Page Switcher Dropdown */}
           <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <select
               defaultValue=""
@@ -1384,9 +1468,9 @@ export default function Page_HomeScreen({
               style={{
                 appearance: "none",
                 WebkitAppearance: "none",
-                backgroundColor: "rgba(16, 28, 18, 0.95)",
-                color: "#86efac",
-                border: "1px solid rgba(34, 197, 94, 0.35)",
+                backgroundColor: isWhite ? "#ffffff" : "rgba(16, 28, 18, 0.95)",
+                color: isWhite ? "#475569" : "#86efac",
+                border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(34, 197, 94, 0.35)",
                 borderRadius: "5px",
                 padding: "4px 26px 4px 10px",
                 fontSize: "11px",
@@ -1397,19 +1481,19 @@ export default function Page_HomeScreen({
               }}
               title="Navigate to other 3D / Terminal pages"
             >
-              <option value="" style={{ backgroundColor: "#0b150d", color: "#94a3b8" }}>
+              <option value="" style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#64748b" : "#94a3b8" }}>
                 🧭 Switch View ▾
               </option>
-              <option value="terminal" style={{ backgroundColor: "#0b150d", color: "#86efac" }}>
+              <option value="terminal" style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#0f172a" : "#86efac" }}>
                 CRT Terminal
               </option>
-              <option value="network" style={{ backgroundColor: "#0b150d", color: "#38bdf8" }}>
+              <option value="network" style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#0f172a" : "#38bdf8" }}>
                 3D Network 503
               </option>
-              <option value="404" style={{ backgroundColor: "#0b150d", color: "#facc15" }}>
+              <option value="404" style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#0f172a" : "#facc15" }}>
                 3D 404 Error
               </option>
-              <option value="laptop" style={{ backgroundColor: "#0b150d", color: "#f472b6" }}>
+              <option value="laptop" style={{ backgroundColor: isWhite ? "#ffffff" : "#0b150d", color: isWhite ? "#0f172a" : "#f472b6" }}>
                 3D Server Laptop
               </option>
             </select>
@@ -1418,7 +1502,7 @@ export default function Page_HomeScreen({
               style={{
                 position: "absolute",
                 right: "8px",
-                color: "#86efac",
+                color: isWhite ? "#64748b" : "#86efac",
                 pointerEvents: "none",
               }}
             />
@@ -1428,8 +1512,8 @@ export default function Page_HomeScreen({
             onClick={() => setSoundEnabled((v) => !v)}
             style={{
               background: "transparent",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
-              color: soundEnabled ? "#4ade80" : "#64748b",
+              border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+              color: soundEnabled ? (isWhite ? "#16a34a" : "#4ade80") : "#94a3b8",
               padding: "5px 8px",
               borderRadius: "5px",
               cursor: "pointer",
@@ -1448,12 +1532,13 @@ export default function Page_HomeScreen({
         ref={containerRef}
         style={{
           flex: 1,
-          width: "100%",
           display: "flex",
-          padding: "8px 12px",
+          flexDirection: "row",
+          padding: "10px 14px",
+          gap: "0px",
           boxSizing: "border-box",
           overflow: "hidden",
-          userSelect: isDragging ? "none" : "auto",
+          position: "relative",
         }}
       >
         {/* =================================================================== */}
@@ -1463,118 +1548,84 @@ export default function Page_HomeScreen({
           style={{
             width: isOutputOpen ? `${splitPercent}%` : "100%",
             height: "100%",
-            backgroundColor: "rgba(6, 12, 7, 0.98)",
-            border: "1.5px solid rgba(34, 197, 94, 0.4)",
+            backgroundColor: isWhite ? "#ffffff" : "rgba(6, 12, 8, 0.98)",
+            border: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.35)",
             borderRadius: "8px",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
-            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7)",
+            boxShadow: isWhite ? "0 4px 20px rgba(0, 0, 0, 0.05)" : "0 8px 30px rgba(0, 0, 0, 0.6)",
             transition: isDragging ? "none" : "width 0.15s ease",
           }}
         >
-          {/* Editor Header Bar (Responsive - Compile button is always prominent) */}
+          {/* Left Editor Header Bar with Integrated Compile Action Button */}
           <div
             style={{
-              height: "40px",
-              padding: "0 10px",
+              height: "42px",
+              padding: "0 12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              background: "rgba(10, 20, 12, 0.98)",
-              borderBottom: "1.5px solid rgba(34, 197, 94, 0.25)",
+              background: isWhite ? "#f8fafc" : "rgba(10, 20, 12, 0.98)",
+              borderBottom: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.25)",
               flexShrink: 0,
-              gap: 8,
-              overflow: "hidden",
             }}
           >
-            {/* Left Title: Flexible and yields space so Compile button is never squeezed */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                minWidth: 0,
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-              }}
-            >
-              <span
+            {/* Title & Language Badge */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, overflow: "hidden" }}>
+              <div
                 style={{
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  background: "rgba(34, 197, 94, 0.2)",
-                  border: "1px solid #22c55e",
-                  color: "#39ff14",
-                  fontSize: "11px",
-                  fontWeight: 900,
-                  fontFamily: "'JetBrains Mono', monospace",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  color: isWhite ? "#2563eb" : "#39ff14",
+                  fontSize: "12px",
+                  fontWeight: 800,
                   letterSpacing: "0.05em",
-                  flexShrink: 0,
                 }}
               >
-                {currentLangObj.icon}
+                <Terminal size={14} />
+                <span>{selectedLangConfig.file}</span>
+              </div>
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  padding: "1px 6px",
+                  borderRadius: "4px",
+                  background: isWhite ? "#eff6ff" : "rgba(34, 197, 94, 0.15)",
+                  color: isWhite ? "#1d4ed8" : "#86efac",
+                  border: isWhite ? "1px solid #bfdbfe" : "1px solid rgba(34, 197, 94, 0.3)",
+                }}
+              >
+                {selectedLangConfig.name}
               </span>
               <span
                 style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: "16px",
-                  letterSpacing: "0.08em",
-                  color: "#ffffff",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  fontSize: "9.5px",
+                  fontWeight: 700,
+                  padding: "1px 5px",
+                  borderRadius: "3px",
+                  background: isWhite ? "#f1f5f9" : "rgba(255, 255, 255, 0.06)",
+                  color: isWhite ? "#64748b" : "#94a3b8",
                 }}
               >
-                {splitPercent < 35 ? currentLangObj.name.toUpperCase() : `SOURCE EDITOR [${currentLangObj.name.toUpperCase()}]`}
+                {isWhite ? "Free Tier" : "Matrix Pro"}
               </span>
             </div>
 
-            {/* Right Action Buttons: flexShrink: 0 guarantees Compile Button is ALWAYS Visible */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              {/* If output is closed, show prominent RE-OPEN button */}
-              {!isOutputOpen && (
-                <button
-                  onClick={() => {
-                    sfx.playClick();
-                    setIsOutputOpen(true);
-                  }}
-                  style={{
-                    padding: "4px 10px",
-                    borderRadius: "5px",
-                    background: "rgba(34, 197, 94, 0.25)",
-                    border: "1.5px solid #22c55e",
-                    color: "#39ff14",
-                    fontSize: "11px",
-                    fontWeight: 900,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                    boxShadow: "0 0 10px rgba(34, 197, 94, 0.35)",
-                    flexShrink: 0,
-                  }}
-                  title="Show Output Terminal"
-                >
-                  <Terminal size={13} />
-                  <span>OUTPUT</span>
-                </button>
-              )}
-
-              {/* Reset Template */}
+            {/* Quick Actions + Run Compile Button */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {/* Reset to Default */}
               <button
-                onClick={() => {
-                  sfx.playClick();
-                  handleCodeChange(currentLangObj.def);
-                }}
-                title="Reset Code Template"
+                onClick={handleResetCode}
+                title="Reset to Template"
                 style={{
                   padding: "4px 7px",
                   borderRadius: "4px",
                   background: "transparent",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  color: "#94a3b8",
+                  border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+                  color: isWhite ? "#64748b" : "#94a3b8",
                   fontSize: "11px",
                   cursor: "pointer",
                   display: "flex",
@@ -1599,8 +1650,8 @@ export default function Page_HomeScreen({
                   padding: "4px 7px",
                   borderRadius: "4px",
                   background: "transparent",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  color: "#94a3b8",
+                  border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+                  color: isWhite ? "#64748b" : "#94a3b8",
                   fontSize: "11px",
                   cursor: "pointer",
                   display: "flex",
@@ -1623,13 +1674,17 @@ export default function Page_HomeScreen({
                   gap: 6,
                   padding: "5px 12px",
                   borderRadius: "5px",
-                  background: "linear-gradient(135deg, #15803d 0%, #16a34a 100%)",
-                  border: "1.5px solid #22c55e",
+                  background: isWhite
+                    ? "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
+                    : "linear-gradient(135deg, #15803d 0%, #16a34a 100%)",
+                  border: isWhite ? "1.5px solid #2563eb" : "1.5px solid #22c55e",
                   color: "#ffffff",
                   fontSize: "12px",
                   fontWeight: 900,
                   cursor: isCompiling ? "not-allowed" : "pointer",
-                  boxShadow: "0 0 14px rgba(34, 197, 94, 0.45)",
+                  boxShadow: isWhite
+                    ? "0 2px 10px rgba(37, 99, 235, 0.35)"
+                    : "0 0 14px rgba(34, 197, 94, 0.45)",
                   opacity: isCompiling ? 0.7 : 1,
                   flexShrink: 0,
                   whiteSpace: "nowrap",
@@ -1654,7 +1709,7 @@ export default function Page_HomeScreen({
             style={{
               flex: 1,
               display: "flex",
-              backgroundColor: "#040804",
+              backgroundColor: isWhite ? "#ffffff" : "#040804",
               position: "relative",
               overflow: "hidden",
             }}
@@ -1664,9 +1719,9 @@ export default function Page_HomeScreen({
               style={{
                 width: "44px",
                 padding: "12px 6px",
-                background: "rgba(3, 6, 3, 0.85)",
-                borderRight: "1px solid rgba(34, 197, 94, 0.2)",
-                color: "#475569",
+                background: isWhite ? "#f8fafc" : "rgba(3, 6, 3, 0.85)",
+                borderRight: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(34, 197, 94, 0.2)",
+                color: isWhite ? "#94a3b8" : "#475569",
                 fontSize: "13px",
                 fontFamily: "'JetBrains Mono', monospace",
                 textAlign: "right",
@@ -1694,7 +1749,7 @@ export default function Page_HomeScreen({
                 flex: 1,
                 padding: "12px 14px",
                 background: "transparent",
-                color: "#f8fafc",
+                color: isWhite ? "#0f172a" : "#f8fafc",
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "13px",
                 lineHeight: "1.65",
@@ -1714,18 +1769,18 @@ export default function Page_HomeScreen({
             style={{
               height: "26px",
               padding: "0 14px",
-              background: "rgba(5, 10, 6, 0.98)",
-              borderTop: "1px solid rgba(34, 197, 94, 0.15)",
+              background: isWhite ? "#f8fafc" : "rgba(5, 10, 6, 0.98)",
+              borderTop: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(34, 197, 94, 0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               fontSize: "11px",
-              color: "#64748b",
+              color: isWhite ? "#64748b" : "#64748b",
               flexShrink: 0,
             }}
           >
             <span>{codeLines.length} lines • UTF-8 • Tab: 4 spaces</span>
-            <span style={{ color: "#39ff14" }}>Press Ctrl + Enter to Compile</span>
+            <span style={{ color: isWhite ? "#2563eb" : "#39ff14", fontWeight: 700 }}>Press Ctrl + Enter to Compile</span>
           </div>
         </div>
 
@@ -1746,7 +1801,7 @@ export default function Page_HomeScreen({
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: isDragging ? "rgba(34, 197, 94, 0.4)" : "transparent",
+              backgroundColor: isDragging ? (isWhite ? "rgba(37, 99, 235, 0.15)" : "rgba(34, 197, 94, 0.4)") : "transparent",
               transition: "background-color 0.15s ease",
               userSelect: "none",
               zIndex: 30,
@@ -1755,17 +1810,17 @@ export default function Page_HomeScreen({
             title="Drag to resize Editor & Output panels (or use layout slider above)"
           >
             {/* Visual Grip Handle with arrows and dots */}
-            <span style={{ fontSize: "9px", color: isDragging ? "#39ff14" : "#4ade80", userSelect: "none" }}>◀</span>
+            <span style={{ fontSize: "9px", color: isDragging ? (isWhite ? "#2563eb" : "#39ff14") : (isWhite ? "#94a3b8" : "#4ade80"), userSelect: "none" }}>◀</span>
             <div
               style={{
                 width: "4px",
                 height: "48px",
                 borderRadius: "2px",
-                backgroundColor: isDragging ? "#39ff14" : "rgba(34, 197, 94, 0.6)",
-                boxShadow: isDragging ? "0 0 10px #39ff14" : "none",
+                backgroundColor: isDragging ? (isWhite ? "#2563eb" : "#39ff14") : (isWhite ? "#cbd5e1" : "rgba(34, 197, 94, 0.6)"),
+                boxShadow: isDragging ? (isWhite ? "0 0 8px rgba(37, 99, 235, 0.5)" : "0 0 10px #39ff14") : "none",
               }}
             />
-            <span style={{ fontSize: "9px", color: isDragging ? "#39ff14" : "#4ade80", userSelect: "none" }}>▶</span>
+            <span style={{ fontSize: "9px", color: isDragging ? (isWhite ? "#2563eb" : "#39ff14") : (isWhite ? "#94a3b8" : "#4ade80"), userSelect: "none" }}>▶</span>
           </div>
         )}
 
@@ -1777,13 +1832,13 @@ export default function Page_HomeScreen({
             style={{
               width: `calc(${100 - splitPercent}% - 16px)`,
               height: "100%",
-              backgroundColor: "rgba(5, 9, 6, 0.98)",
-              border: "1.5px solid rgba(34, 197, 94, 0.4)",
+              backgroundColor: isWhite ? "#ffffff" : "rgba(5, 9, 6, 0.98)",
+              border: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.4)",
               borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
-              boxShadow: "0 8px 30px rgba(0, 0, 0, 0.7)",
+              boxShadow: isWhite ? "0 4px 20px rgba(0, 0, 0, 0.05)" : "0 8px 30px rgba(0, 0, 0, 0.7)",
               transition: isDragging ? "none" : "width 0.15s ease",
             }}
           >
@@ -1795,15 +1850,14 @@ export default function Page_HomeScreen({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                background: "rgba(10, 20, 12, 0.98)",
-                borderBottom: "1.5px solid rgba(34, 197, 94, 0.25)",
+                background: isWhite ? "#f8fafc" : "rgba(10, 20, 12, 0.98)",
+                borderBottom: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.25)",
                 flexShrink: 0,
-                gap: 8,
               }}
             >
               {/* Left: Tab Switchers: [ 📟 OUTPUT TERMINAL ] vs [ 🧠 COMPLEXITY & ALGO ] */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {/* Terminal Tab */}
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                {/* Tab 1: Terminal Output */}
                 <button
                   onClick={() => {
                     sfx.playClick();
@@ -1813,45 +1867,34 @@ export default function Page_HomeScreen({
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    padding: "4px 10px",
+                    padding: "5px 10px",
                     borderRadius: "5px",
-                    border:
-                      activeRightTab === "terminal"
-                        ? "1.5px solid #22c55e"
-                        : "1px solid transparent",
                     background:
                       activeRightTab === "terminal"
-                        ? "rgba(34, 197, 94, 0.2)"
+                        ? (isWhite ? "#ffffff" : "rgba(34, 197, 94, 0.2)")
                         : "transparent",
-                    color: activeRightTab === "terminal" ? "#ffffff" : "#94a3b8",
-                    fontSize: "12px",
+                    border:
+                      activeRightTab === "terminal"
+                        ? (isWhite ? "1.5px solid #2563eb" : "1.5px solid #22c55e")
+                        : "1px solid transparent",
+                    color:
+                      activeRightTab === "terminal"
+                        ? (isWhite ? "#2563eb" : "#39ff14")
+                        : (isWhite ? "#64748b" : "#64748b"),
+                    fontSize: "11.5px",
                     fontWeight: 800,
                     cursor: "pointer",
-                    transition: "all 0.15s ease",
+                    boxShadow:
+                      activeRightTab === "terminal"
+                        ? (isWhite ? "0 1px 3px rgba(0,0,0,0.06)" : "0 0 8px rgba(34, 197, 94, 0.25)")
+                        : "none",
                   }}
                 >
-                  <Terminal size={14} style={{ color: "#39ff14" }} />
-                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "16px", letterSpacing: "0.06em" }}>
-                    OUTPUT TERMINAL
-                  </span>
-                  {outputResult.hasRun && (
-                    <span
-                      style={{
-                        fontSize: "9.5px",
-                        padding: "1px 5px",
-                        borderRadius: "3px",
-                        background: outputResult.isError ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
-                        border: outputResult.isError ? "1px solid #ef4444" : "1px solid #22c55e",
-                        color: outputResult.isError ? "#ef4444" : "#39ff14",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {outputResult.isError ? "ERR" : "OK"}
-                    </span>
-                  )}
+                  <Terminal size={13} />
+                  <span>Terminal</span>
                 </button>
 
-                {/* Dedicated Complexity & Algorithm Panel Tab */}
+                {/* Tab 2: Complexity Panel */}
                 <button
                   onClick={() => {
                     sfx.playClick();
@@ -1861,110 +1904,69 @@ export default function Page_HomeScreen({
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    padding: "4px 10px",
+                    padding: "5px 10px",
                     borderRadius: "5px",
-                    border:
-                      activeRightTab === "complexity"
-                        ? "1.5px solid #38bdf8"
-                        : "1px solid rgba(56, 189, 248, 0.25)",
                     background:
                       activeRightTab === "complexity"
-                        ? "rgba(56, 189, 248, 0.2)"
-                        : "rgba(56, 189, 248, 0.06)",
-                    color: activeRightTab === "complexity" ? "#ffffff" : "#38bdf8",
-                    fontSize: "12px",
+                        ? (isWhite ? "#eff6ff" : "rgba(56, 189, 248, 0.25)")
+                        : "transparent",
+                    border:
+                      activeRightTab === "complexity"
+                        ? (isWhite ? "1.5px solid #2563eb" : "1.5px solid #38bdf8")
+                        : "1px solid transparent",
+                    color:
+                      activeRightTab === "complexity"
+                        ? (isWhite ? "#2563eb" : "#38bdf8")
+                        : (isWhite ? "#64748b" : "#64748b"),
+                    fontSize: "11.5px",
                     fontWeight: 800,
                     cursor: "pointer",
-                    transition: "all 0.15s ease",
+                    boxShadow:
+                      activeRightTab === "complexity"
+                        ? (isWhite ? "0 2px 6px rgba(37, 99, 235, 0.15)" : "0 0 10px rgba(56, 189, 248, 0.35)")
+                        : "none",
                   }}
-                  title="View Space Complexity, Time Complexity, Algorithm Used & Optimization Suggestions"
                 >
-                  <Cpu size={14} style={{ color: "#38bdf8" }} />
-                  <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "16px", letterSpacing: "0.06em" }}>
-                    COMPLEXITY & ALGO
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "9.5px",
-                      padding: "1px 6px",
-                      borderRadius: "3px",
-                      background: `${complexityAnalysis.timeComplexity.color}25`,
-                      border: `1px solid ${complexityAnalysis.timeComplexity.color}`,
-                      color: complexityAnalysis.timeComplexity.color,
-                      fontWeight: 800,
-                      fontFamily: "'JetBrains Mono', monospace",
-                    }}
-                  >
-                    {complexityAnalysis.timeComplexity.bigO}
-                  </span>
+                  <Cpu size={13} />
+                  <span>🧠 Complexity ({complexityAnalysis.timeComplexity.bigO})</span>
                 </button>
               </div>
 
-              {/* Right: Status Pill & Action Buttons */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                {activeRightTab === "terminal" && outputResult.hasRun && (
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      padding: "2px 8px",
-                      borderRadius: "4px",
-                      background: outputResult.isError ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)",
-                      border: outputResult.isError ? "1px solid #ef4444" : "1px solid #22c55e",
-                      color: outputResult.isError ? "#ef4444" : "#39ff14",
-                      fontWeight: 800,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    {outputResult.isError ? (
-                      <>
-                        <AlertTriangle size={12} />
-                        <span>EXIT {outputResult.exitCode}</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 size={12} />
-                        <span>SUCCESS</span>
-                      </>
-                    )}
-                  </span>
-                )}
-
+              {/* Right: Terminal Utilities & Close Button */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {activeRightTab === "terminal" && (
                   <>
                     {/* Copy Output Button */}
                     <button
                       onClick={handleCopyOutput}
-                      title="Copy output to clipboard"
+                      title="Copy Output to Clipboard"
                       style={{
-                        padding: "4px 8px",
+                        padding: "3px 8px",
                         borderRadius: "4px",
-                        background: copiedOutput ? "rgba(34, 197, 94, 0.25)" : "transparent",
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        color: copiedOutput ? "#39ff14" : "#94a3b8",
+                        background: "transparent",
+                        border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+                        color: copiedOutput ? (isWhite ? "#16a34a" : "#22c55e") : (isWhite ? "#64748b" : "#94a3b8"),
                         fontSize: "11px",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
                         gap: 4,
-                        transition: "all 0.15s ease",
                       }}
                     >
-                      {copiedOutput ? <Check size={12} /> : <Copy size={12} />}
+                      {copiedOutput ? <Check size={12} color={isWhite ? "#16a34a" : "#22c55e"} /> : <Copy size={12} />}
                       <span>{copiedOutput ? "Copied" : "Copy"}</span>
                     </button>
 
-                    {/* Clear Output Button */}
+                    {/* Clear Terminal Output */}
                     <button
                       onClick={handleClearOutput}
-                      title="Clear output"
+                      title="Clear Output Window"
                       style={{
-                        padding: "4px 8px",
+                        padding: "3px 8px",
                         borderRadius: "4px",
                         background: "transparent",
-                        border: "1px solid rgba(255, 255, 255, 0.15)",
-                        color: "#94a3b8",
+                        border: isWhite ? "1px solid #cbd5e1" : "1px solid rgba(255, 255, 255, 0.15)",
+                        color: isWhite ? "#64748b" : "#94a3b8",
                         fontSize: "11px",
                         cursor: "pointer",
                         display: "flex",
@@ -1972,86 +1974,66 @@ export default function Page_HomeScreen({
                         gap: 4,
                       }}
                     >
-                      <RotateCcw size={12} />
+                      <Trash2 size={12} />
                       <span>Clear</span>
                     </button>
                   </>
                 )}
 
-                {/* Close Window Button [X] */}
+                {/* Close Output Window Button */}
                 <button
                   onClick={() => {
                     sfx.playClick();
                     setIsOutputOpen(false);
                   }}
-                  title="Close Output Panel"
+                  title="Close Output Terminal"
                   style={{
-                    padding: "4px 9px",
+                    padding: "3px 6px",
                     borderRadius: "4px",
-                    background: "rgba(239, 68, 68, 0.2)",
-                    border: "1px solid #ef4444",
-                    color: "#ffffff",
-                    fontSize: "11px",
-                    fontWeight: 900,
+                    background: "transparent",
+                    border: "none",
+                    color: isWhite ? "#94a3b8" : "#64748b",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    gap: 4,
-                    transition: "all 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#dc2626";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
                   }}
                 >
-                  <X size={13} />
-                  <span>[X]</span>
+                  <X size={14} />
                 </button>
               </div>
             </div>
 
-            {/* Re-opened Notice Toast Banner */}
-            {reopenNotice && (
-              <div
-                style={{
-                  padding: "6px 12px",
-                  background: "rgba(34, 197, 94, 0.2)",
-                  borderBottom: "1px solid #22c55e",
-                  color: "#39ff14",
-                  fontSize: "11.5px",
-                  fontWeight: 800,
-                  textAlign: "center",
-                }}
-              >
-                ⚡ Output Terminal Automatically Re-opened for Execution!
-              </div>
-            )}
-
-            {/* Right Panel Main Content: Terminal OR Dedicated Complexity Panel */}
+            {/* TAB CONTENT: EITHER COMPLEXITY PANEL OR LIVE OUTPUT TERMINAL */}
             {activeRightTab === "complexity" ? (
               <ComplexityPanel
                 analysis={complexityAnalysis}
                 selectedLang={selectedLang}
-                onApplyCode={handleApplySuggestion}
-                onReAnalyze={() => {}}
+                themeMode={themeMode}
+                onApplyCode={(optimizedCode) => {
+                  handleCodeChange(optimizedCode);
+                  if (textareaRef.current) textareaRef.current.focus();
+                }}
+                onReAnalyze={() => {
+                  sfx.playClick();
+                }}
+                isAnalyzing={false}
               />
             ) : (
-              /* Full-Height Output Display Area */
+              /* LIVE TERMINAL OUTPUT VIEW */
               <div
                 style={{
                   flex: 1,
-                  padding: "14px 16px",
-                  overflowY: "auto",
-                  boxSizing: "border-box",
-                  background: "#030603",
                   display: "flex",
                   flexDirection: "column",
+                  padding: "12px 14px",
+                  overflowY: "auto",
+                  backgroundColor: isWhite ? "#ffffff" : "transparent",
+                  boxSizing: "border-box",
+                  gap: 12,
                 }}
               >
-                {/* Case 1: Terminal has not run yet */}
-                {!outputResult.hasRun ? (
+                {!hasRun ? (
+                  /* Case 1: IDLE / READY - Waiting for user to run */
                   <div
                     style={{
                       flex: 1,
@@ -2059,89 +2041,134 @@ export default function Page_HomeScreen({
                       flexDirection: "column",
                       justifyContent: "center",
                       alignItems: "center",
-                      color: "#64748b",
+                      border: isWhite ? "1.5px dashed #cbd5e1" : "1.5px dashed rgba(34, 197, 94, 0.25)",
+                      borderRadius: "6px",
+                      padding: "24px",
+                      background: isWhite ? "#f8fafc" : "#030604",
+                      color: isWhite ? "#64748b" : "#4ade80",
                       textAlign: "center",
-                      padding: "20px",
-                      gap: 10,
+                      gap: 12,
                     }}
                   >
-                    <Terminal size={36} style={{ color: "rgba(34, 197, 94, 0.4)" }} />
-                    <div style={{ fontSize: "14px", fontWeight: 700, color: "#94a3b8" }}>
-                      Terminal Ready
+                    <div
+                      style={{
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "50%",
+                        background: isWhite ? "#eff6ff" : "rgba(34, 197, 94, 0.15)",
+                        border: isWhite ? "1.5px solid #bfdbfe" : "1.5px solid #22c55e",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: isWhite ? "#2563eb" : "#39ff14",
+                        boxShadow: isWhite ? "0 2px 8px rgba(37, 99, 235, 0.1)" : "0 0 15px rgba(34, 197, 94, 0.3)",
+                      }}
+                    >
+                      <Terminal size={22} />
                     </div>
-                    <div style={{ fontSize: "12px", maxWidth: "340px", lineHeight: "1.5" }}>
-                      Write or edit your code on the left, then click{" "}
-                      <span style={{ color: "#39ff14", fontWeight: 700 }}>COMPILE & RUN</span> or press{" "}
-                      <kbd style={{ background: "#1e293b", padding: "2px 6px", borderRadius: "3px", color: "#f8fafc" }}>
-                        Ctrl + Enter
-                      </kbd>
-                      .
+
+                    <div>
+                      <div style={{ fontSize: "14px", fontWeight: 800, color: isWhite ? "#0f172a" : "#39ff14", marginBottom: "4px" }}>
+                        SwaplyOne Compiler Daemon Ready
+                      </div>
+                      <div style={{ fontSize: "12px", color: isWhite ? "#64748b" : "#94a3b8", maxWidth: "340px", lineHeight: "1.5" }}>
+                        Target architecture: <strong>{selectedLangConfig.tag}</strong>. Press <strong>Compile & Run</strong> or hit <strong>Ctrl + Enter</strong> to build and execute your code.
+                      </div>
                     </div>
+
+                    <pre
+                      style={{
+                        margin: 0,
+                        padding: "10px 14px",
+                        background: isWhite ? "#ffffff" : "rgba(0, 0, 0, 0.4)",
+                        border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.08)",
+                        borderRadius: "5px",
+                        fontSize: "11px",
+                        color: isWhite ? "#475569" : "#86efac",
+                        fontFamily: "'JetBrains Mono', monospace",
+                        textAlign: "left",
+                        width: "100%",
+                        maxWidth: "420px",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {decryptedText}
+                    </pre>
                   </div>
                 ) : outputResult.isError ? (
-                  /* Case 2: Compilation or Runtime Error */
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {/* Error Header Banner */}
+                  /* Case 2: COMPILER / SYNTAX ERROR - Real Diagnostic Box */
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                      flex: 1,
+                    }}
+                  >
+                    {/* Error Summary Banner */}
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
                         padding: "8px 12px",
-                        background: "rgba(239, 68, 68, 0.15)",
-                        border: "1px solid #ef4444",
+                        background: isWhite ? "#fef2f2" : "rgba(239, 68, 68, 0.12)",
+                        border: isWhite ? "1px solid #fecaca" : "1px solid rgba(239, 68, 68, 0.4)",
                         borderRadius: "6px",
+                        flexShrink: 0,
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#f87171", fontWeight: 800, fontSize: "12px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: isWhite ? "#b91c1c" : "#f87171", fontWeight: 800, fontSize: "12px" }}>
                         <AlertTriangle size={15} />
-                        <span>BUILD FAILED • PROCESS TERMINATED (EXIT CODE {outputResult.exitCode})</span>
+                        <span>COMPILATION / EXECUTION ERROR</span>
                       </div>
-                      <span style={{ fontSize: "11px", color: "#94a3b8" }}>{outputResult.compileTime}</span>
+                      <span style={{ fontSize: "11px", color: isWhite ? "#dc2626" : "#fca5a5", fontFamily: "'JetBrains Mono', monospace" }}>
+                        Exit Code: {outputResult.exitCode || 1}
+                      </span>
                     </div>
 
-                    {/* Error Card */}
+                    {/* Error Details Card */}
                     <div
                       style={{
-                        background: "rgba(15, 23, 42, 0.7)",
-                        border: "1.5px solid rgba(239, 68, 68, 0.4)",
+                        background: isWhite ? "#ffffff" : "#0d0404",
+                        border: isWhite ? "1.5px solid #fca5a5" : "1.5px solid rgba(239, 68, 68, 0.4)",
                         borderRadius: "6px",
                         padding: "14px",
                         display: "flex",
                         flexDirection: "column",
                         gap: 10,
+                        overflowY: "auto",
                       }}
                     >
-                      <div style={{ color: "#ef4444", fontWeight: 900, fontSize: "13.5px", letterSpacing: "0.02em" }}>
-                        ❌ {outputResult.errorObj?.title || "Compilation Error"}
+                      <div style={{ fontSize: "13px", fontWeight: 800, color: isWhite ? "#dc2626" : "#f87171" }}>
+                        {outputResult.errorObj?.title || "Syntax or Runtime Exception"}
                       </div>
 
+                      {/* Source Code Line Pinpointer */}
                       {outputResult.errorObj?.sourceLine && (
                         <div
                           style={{
-                            background: "#070b08",
-                            padding: "10px 12px",
-                            borderRadius: "4px",
-                            border: "1px solid rgba(239, 68, 68, 0.25)",
+                            background: isWhite ? "#f8fafc" : "rgba(0, 0, 0, 0.6)",
+                            border: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(255, 255, 255, 0.1)",
+                            borderRadius: "5px",
+                            padding: "8px 12px",
                             fontFamily: "'JetBrains Mono', monospace",
                             fontSize: "12px",
-                            lineHeight: "1.6",
-                            color: "#fca5a5",
-                            whiteSpace: "pre",
-                            overflowX: "auto",
                           }}
                         >
-                          <div style={{ color: "#64748b" }}>
+                          <div style={{ color: isWhite ? "#64748b" : "#94a3b8", fontSize: "11px", marginBottom: "4px" }}>
                             {`--> ${selectedLang.toUpperCase()}_SOURCE : Line ${outputResult.errorObj?.line || 1}`}
                           </div>
                           <div>
-                            <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                            <span style={{ color: isWhite ? "#dc2626" : "#ef4444", fontWeight: 700 }}>
                               {outputResult.errorObj?.line || 1} |{" "}
                             </span>
-                            {outputResult.errorObj?.sourceLine}
+                            <span style={{ color: isWhite ? "#0f172a" : "#f8fafc" }}>
+                              {outputResult.errorObj?.sourceLine}
+                            </span>
                           </div>
                           {outputResult.errorObj?.pointer && (
-                            <div style={{ color: "#f87171" }}>
+                            <div style={{ color: isWhite ? "#dc2626" : "#f87171" }}>
                               {"    | "}
                               {outputResult.errorObj?.pointer}
                             </div>
@@ -2153,16 +2180,16 @@ export default function Page_HomeScreen({
                       {outputResult.errorObj?.explanation && (
                         <div
                           style={{
-                            background: "rgba(234, 179, 8, 0.12)",
-                            border: "1px solid rgba(234, 179, 8, 0.4)",
+                            background: isWhite ? "#fefce8" : "rgba(234, 179, 8, 0.12)",
+                            border: isWhite ? "1px solid #fef08a" : "1px solid rgba(234, 179, 8, 0.4)",
                             borderRadius: "5px",
                             padding: "10px 12px",
-                            color: "#fef08a",
+                            color: isWhite ? "#854d0e" : "#fef08a",
                             fontSize: "12px",
                             lineHeight: "1.5",
                           }}
                         >
-                          <span style={{ fontWeight: 800, color: "#facc15" }}>💡 Simple Explanation: </span>
+                          <span style={{ fontWeight: 800, color: isWhite ? "#a16207" : "#facc15" }}>💡 Simple Explanation: </span>
                           {outputResult.errorObj.explanation}
                         </div>
                       )}
@@ -2178,35 +2205,37 @@ export default function Page_HomeScreen({
                         alignItems: "center",
                         justifyContent: "space-between",
                         padding: "8px 12px",
-                        background: "rgba(34, 197, 94, 0.12)",
-                        border: "1px solid rgba(34, 197, 94, 0.4)",
+                        background: isWhite ? "#f0fdf4" : "rgba(34, 197, 94, 0.12)",
+                        border: isWhite ? "1px solid #bbf7d0" : "1px solid rgba(34, 197, 94, 0.4)",
                         borderRadius: "6px",
                         flexShrink: 0,
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#4ade80", fontWeight: 800, fontSize: "12px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, color: isWhite ? "#15803d" : "#4ade80", fontWeight: 800, fontSize: "12px" }}>
                         <CheckCircle2 size={15} />
                         <span>PROGRAM FINISHED SUCCESSFULLY • EXIT CODE 0</span>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "11px" }}>
-                        <span style={{ color: "#38bdf8", fontWeight: 700 }}>{outputResult.compileTime}</span>
-                        <span style={{ color: "#64748b" }}>•</span>
-                        <span style={{ color: "#94a3b8" }}>{outputResult.memory}</span>
+                        <span style={{ color: isWhite ? "#2563eb" : "#38bdf8", fontWeight: 700 }}>{outputResult.compileTime}</span>
+                        <span style={{ color: isWhite ? "#94a3b8" : "#64748b" }}>•</span>
+                        <span style={{ color: isWhite ? "#64748b" : "#94a3b8" }}>{outputResult.memory}</span>
                       </div>
                     </div>
 
-                    {/* Clear Monospace Program STDOUT Box - Classic Cyber Green Theme */}
+                    {/* Clear Monospace Program STDOUT Box - Studio Light or Classic Cyber Green */}
                     <div
                       style={{
                         flex: 1,
-                        background: "#030603",
-                        border: "1.5px solid rgba(34, 197, 94, 0.35)",
+                        background: isWhite ? "#f8fafc" : "#030603",
+                        border: isWhite ? "1.5px solid #e2e8f0" : "1.5px solid rgba(34, 197, 94, 0.35)",
                         borderRadius: "6px",
                         padding: "14px 16px",
                         overflowY: "auto",
                         display: "flex",
                         flexDirection: "column",
-                        boxShadow: "inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.1)",
+                        boxShadow: isWhite
+                          ? "inset 0 1px 3px rgba(0, 0, 0, 0.04)"
+                          : "inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.1)",
                       }}
                     >
                       <div
@@ -2216,14 +2245,14 @@ export default function Page_HomeScreen({
                           justifyContent: "space-between",
                           marginBottom: "10px",
                           paddingBottom: "6px",
-                          borderBottom: "1px solid rgba(34, 197, 94, 0.2)",
+                          borderBottom: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(34, 197, 94, 0.2)",
                           flexShrink: 0,
                         }}
                       >
-                        <span style={{ fontSize: "11px", color: "#4ade80", fontWeight: 800, letterSpacing: "0.08em" }}>
+                        <span style={{ fontSize: "11px", color: isWhite ? "#475569" : "#4ade80", fontWeight: 800, letterSpacing: "0.08em" }}>
                           STANDARD OUTPUT (STDOUT)
                         </span>
-                        <span style={{ fontSize: "10.5px", color: "#39ff14", fontWeight: 700, textShadow: "0 0 6px #39ff14" }}>
+                        <span style={{ fontSize: "10.5px", color: isWhite ? "#16a34a" : "#39ff14", fontWeight: 700, textShadow: isWhite ? "none" : "0 0 6px #39ff14" }}>
                           ● {isDecrypting ? "DECRYPTING..." : "LIVE"}
                         </span>
                       </div>
@@ -2235,8 +2264,8 @@ export default function Page_HomeScreen({
                             fontFamily: "'JetBrains Mono', monospace",
                             fontSize: "13px",
                             lineHeight: "1.65",
-                            color: "#39ff14",
-                            textShadow: "0 0 8px rgba(57, 255, 20, 0.45)",
+                            color: isWhite ? "#0f172a" : "#39ff14",
+                            textShadow: isWhite ? "none" : "0 0 8px rgba(57, 255, 20, 0.45)",
                             whiteSpace: "pre-wrap",
                             wordBreak: "break-all",
                             flex: 1,
@@ -2250,15 +2279,15 @@ export default function Page_HomeScreen({
                             fontFamily: "'JetBrains Mono', monospace",
                             fontSize: "12px",
                             lineHeight: "1.6",
-                            color: "#64748b",
+                            color: isWhite ? "#64748b" : "#64748b",
                             fontStyle: "italic",
                             padding: "10px 0",
                           }}
                         >
                           [Process finished with exit code 0. No stdout produced.]
                           <br />
-                          <span style={{ fontStyle: "normal", color: "#94a3b8", fontSize: "11.5px" }}>
-                            💡 Tip: Add a <code style={{ color: "#39ff14" }}>print()</code> or <code style={{ color: "#39ff14" }}>println!()</code> statement to output text here.
+                          <span style={{ fontStyle: "normal", color: isWhite ? "#475569" : "#94a3b8", fontSize: "11.5px" }}>
+                            💡 Tip: Add a <code style={{ color: isWhite ? "#2563eb" : "#39ff14", fontWeight: 700 }}>print()</code> or <code style={{ color: isWhite ? "#2563eb" : "#39ff14", fontWeight: 700 }}>println!()</code> statement to output text here.
                           </span>
                         </div>
                       )}
@@ -2273,13 +2302,13 @@ export default function Page_HomeScreen({
               style={{
                 height: "26px",
                 padding: "0 14px",
-                background: "rgba(5, 10, 6, 0.98)",
-                borderTop: "1px solid rgba(34, 197, 94, 0.15)",
+                background: isWhite ? "#f8fafc" : "rgba(5, 10, 6, 0.98)",
+                borderTop: isWhite ? "1px solid #e2e8f0" : "1px solid rgba(34, 197, 94, 0.15)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 fontSize: "11px",
-                color: "#64748b",
+                color: isWhite ? "#64748b" : "#64748b",
                 flexShrink: 0,
               }}
             >
